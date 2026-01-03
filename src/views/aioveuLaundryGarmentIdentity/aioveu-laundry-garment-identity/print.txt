@@ -1,0 +1,170 @@
+我们将在现有的衣物唯一编码管理页面中添加单个打印和批量打印功能。根据之前的后端设计，打印功能已经通过独立的打印服务实现，前端需要调用打印服务的接口。
+
+计划：
+
+在表格操作列中添加“打印”按钮，用于单个打印。
+
+在表格上方添加“批量打印”按钮，用于批量打印选中的衣物唯一编码。
+
+实现打印状态轮询和预览功能。
+
+注意：由于打印是异步任务，我们需要：
+
+提交打印任务
+
+轮询打印状态
+
+当打印任务完成时，打开预览页面
+
+步骤：
+
+添加打印相关按钮（单个打印和批量打印）
+
+实现打印任务提交和状态轮询
+
+实现预览页面（新页面或弹窗）
+
+由于打印任务可能包含多个二维码，我们将使用新页面展示打印内容，并调用浏览器打印功能。
+
+修改点：
+
+在操作列添加“打印”按钮
+
+在表格上方添加“批量打印”按钮
+
+添加打印状态轮询逻辑
+
+添加预览页面（这里使用新页面，路由为/print/preview/:printId）
+
+注意：由于打印服务已经提供了预览接口（/api/v1/aioveu-print/preview/{printId}），我们可以直接在新页面中嵌入这个HTML内容。
+
+具体实现：
+
+在操作列添加打印按钮：
+
+权限控制：v-hasPerm="['aioveuLaundryGarmentIdentity:aioveu-laundry-garment-identity:print']"
+
+点击事件：handlePrint(scope.row.id)
+
+在表格上方添加批量打印按钮：
+
+权限控制：v-hasPerm="['aioveuLaundryGarmentIdentity:aioveu-laundry-garment-identity:batchPrint']"
+
+点击事件：handleBatchPrint()
+
+实现打印方法：
+
+单个打印：调用打印服务的单个打印接口（/api/v1/aioveu-print/single）
+
+批量打印：调用打印服务的批量打印接口（/api/v1/aioveu-print/batch）
+
+轮询打印状态：
+
+使用setInterval轮询打印任务状态（/api/v1/aioveu-print/status/{printId}）
+
+当状态为COMPLETED时，打开预览页面
+
+当状态为FAILED时，提示用户
+
+预览页面：
+
+使用新路由/print/preview/:printId
+
+页面内调用打印服务的预览接口获取HTML内容并展示
+
+提供“打印”按钮调用浏览器的打印功能
+
+由于打印服务接口已经定义，我们主要在前端添加调用逻辑。
+
+注意：打印服务接口返回的预览URL（previewUrl）可以直接用作新页面的路由。
+
+
+
+
+在您的前端代码中，您不需要直接调用 getPrintPreview这个 API 方法，而是通过设置 iframe 的 src属性为后端提供的预览 URL 路径（例如 /api/v1/aioveu-print/preview/${printId}）来显示打印预览内容。
+
+为什么这样做？
+​后端渲染 HTML​：
+
+后端生成完整的 HTML 内容
+
+通过一个 URL 提供 HTML 内容
+
+​前端展示​：
+
+使用 iframe 加载这个 URL
+
+在对话框中显示 iframe
+
+​无需额外 API 调用​：
+
+不需要通过 AJAX 获取 HTML 内容
+
+直接使用 URL 即可
+
+
+这个请求通过Nginx反向代理转发到后端服务。以下是详细过程：
+
+前端发起请求：/api/v1/aioveu-print/preview/${printId}
+
+Nginx配置中，如果配置了匹配/api/的location，则会将请求转发到后端服务
+
+但是，您之前的Nginx配置是：
+
+location /prod-api/ {
+
+proxy_pass http://v1.3.2-aioveu-boot:8989/;
+
+}
+
+而前端请求的路径是/api/...，所以需要确保Nginx有匹配/api/的配置。
+
+解决方案：
+
+方案一：修改前端请求路径，使用/prod-api/作为前缀
+
+const url = /prod-api/v1/aioveu-print/preview/${printId};
+
+方案二：修改Nginx配置，添加对/api/的代理
+
+推荐方案二，因为您的前端代码已经使用了/api/前缀。
+
+修改Nginx配置，添加：
+
+location /api/ {
+    proxy_pass http://v1.3.2-aioveu-boot:8989/;
+    # 其他配置...
+}
+这样，当前端请求/api/v1/aioveu-print/preview/PRINT202510210009时，Nginx会将其转发到后端的/v1/aioveu-print/preview/PRINT202510210009（注意：因为proxy_pass后面有斜杠，所以会去掉匹配的前缀/api）。
+
+如果后端服务的接口路径是/api/v1/...，那么需要调整proxy_pass：
+
+location /api/ {
+    proxy_pass http://v1.3.2-aioveu-boot:8989/api/;
+}
+这样，请求/api/v1/...会被转发到后端的/api/v1/...。
+
+请根据您的后端实际接口路径调整。
+
+另外，确保在Nginx配置中传递了必要的头部，特别是Authorization头，因为您使用了token认证：
+
+location /api/ {
+    proxy_pass http://v1.3.2-aioveu-boot:8989/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Authorization $http_authorization;   # 传递Authorization头
+    # 其他配置...
+}
+这样，后端服务就能收到前端发送的Authorization头。
+
+总结步骤：
+
+在Nginx配置中添加或修改location块，匹配/api/路径，并正确代理到后端服务。
+
+确保传递了Authorization头。
+
+重启Nginx使配置生效。
+
+这样，前端的请求就能通过Nginx代理到达后端服务了。
