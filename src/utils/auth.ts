@@ -25,6 +25,16 @@ export class Auth {
   static getAccessToken(): string {
     const isRememberMe = Storage.get<boolean>(AUTH_KEYS.REMEMBER_ME, false);
     // 根据"记住我"状态决定从哪个存储位置获取token
+
+    // 根据"记住我"状态决定从哪个存储位置获取token
+    const token = isRememberMe
+      ? Storage.get<string>(AUTH_KEYS.ACCESS_TOKEN, "")
+      : Storage.sessionGet<string>(AUTH_KEYS.ACCESS_TOKEN, "");
+
+    // 调试日志
+    console.info('Auth.getAccessToken - 原始token:', token);
+    console.info('Auth.getAccessToken - token类型:', typeof token);
+
     return isRememberMe
       ? Storage.get(AUTH_KEYS.ACCESS_TOKEN, "")
       : Storage.sessionGet(AUTH_KEYS.ACCESS_TOKEN, "");
