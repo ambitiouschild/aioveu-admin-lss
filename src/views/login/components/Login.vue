@@ -330,15 +330,18 @@ async function handleLoginSubmit() {
     loading.value = true;        // 开始登录加载状态
 
     // 2. 执行登录（调用Pinia action）
-    console.log("执行登录（调用Pinia action）");
+    console.log("2. 执行登录（调用Pinia action）");
     console.log("loginFormData:{}", loginFormData.value);
     await userStore.login(loginFormData.value);
 
     // 3. 获取用户信息（包含用户角色，用于路由生成）
+    console.log("3. 获取用户信息（包含用户角色，用于路由生成）");
     await userStore.getUserInfo();
 
     // 4. 登录成功，让路由守卫处理跳转逻辑
     // 解析重定向目标（从路由查询参数或默认路径）
+    console.log("4. 登录成功，让路由守卫处理跳转逻辑");
+
     const redirect = resolveRedirectTarget(route.query);
     console.log("登陆成功 🎉 Login successful, target redirect:", redirect);
 
