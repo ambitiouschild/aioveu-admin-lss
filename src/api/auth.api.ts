@@ -2,7 +2,9 @@ import request from "@/utils/request";
 
 const AUTH_BASE_URL = "/aioveu-auth/api/v1/auth";
 
-const AUTH_Login_URL = "/aioveu-auth";
+const AUTH_LOGIN_URL = "/aioveu-auth";
+
+const AUTH_LOGOUT_URL = "/aioveu-lss/api/v1/users";
 
 const AuthAPI = {
 
@@ -59,7 +61,7 @@ const AuthAPI = {
     // }
 
     return request<any, LoginResult>({
-      url: `/aioveu-auth/oauth2/token`,
+      url: `${AUTH_LOGIN_URL}/oauth2/token`,
       method: "post",
       data: formData,
       headers: {
@@ -108,7 +110,7 @@ const AuthAPI = {
   /** 退出登录接口 */
   logout() {
     return request({
-      url: `${AUTH_BASE_URL}/logout`,
+      url: `${AUTH_LOGOUT_URL}/logout`,
       method: "delete",
     });
   },
