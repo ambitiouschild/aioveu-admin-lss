@@ -39,24 +39,24 @@ const AuthAPI = {
     formData.append("grant_type", "password");
 
     // 正确查看FormData内容的方法
-    console.log("📤 登录请求详情:");
-    console.log("用户名:", data.username);
-    console.log("密码:", "******"); // 不打印实际密码
-    console.log("验证码ID:", data.captchaId);
-    console.log("验证码:", data.captchaCode);
-    console.log("授权类型:", "password");
+    // console.log("📤 登录请求详情:");
+    // console.log("用户名:", data.username);
+    // console.log("密码:", "******"); // 不打印实际密码
+    // console.log("验证码ID:", data.captchaId);
+    // console.log("验证码:", data.captchaCode);
+    // console.log("授权类型:", "password");
 
     // 查看Authorization头
-    const authHeader = "Basic bWFsbC1hZG1pbjoxMjM0NTY=";
-    console.log("🔑 Authorization头:", authHeader);
+    // const authHeader = "Basic bWFsbC1hZG1pbjoxMjM0NTY=";  // mall-admin:123456
+    // console.log("🔑 Authorization头:", authHeader);
 
     // 解码查看客户端信息
-    try {
-      const decoded = atob(authHeader.split(" ")[1]);
-      console.log("🔓 解码后的客户端信息:", decoded); // mall-admin:123456
-    } catch (e) {
-      console.error("解码失败:", e);
-    }
+    // try {
+    //   const decoded = atob(authHeader.split(" ")[1]);
+    //   console.log("🔓 解码后的客户端信息:", decoded); // mall-admin:123456
+    // } catch (e) {
+    //   console.error("解码失败:", e);
+    // }
 
     return request<any, LoginResult>({
       url: `/aioveu-auth/oauth2/token`,
@@ -64,10 +64,10 @@ const AuthAPI = {
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: "Basic bWFsbC1hZG1pbjoxMjM0NTY=", // 客户端信息Base64明文：aioveu-admin:123456
+        Authorization: "Basic bWFsbC1hZG1pbjoxMjM0NTY=", // 客户端信息Base64明文：mall-admin:123456
       },
     }).then(response => {
-      console.log("✅ 登录响应:", response);
+      // console.log("✅ 登录响应:", response);
       return response;
     }).catch(error => {
       console.error("❌ 登录错误:", error);

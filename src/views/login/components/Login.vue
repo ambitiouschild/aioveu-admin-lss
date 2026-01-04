@@ -331,7 +331,7 @@ async function handleLoginSubmit() {
 
     // 2. 执行登录（调用Pinia action）
     console.log("2. 执行登录（调用Pinia action）");
-    console.log("loginFormData:{}", loginFormData.value);
+    // console.log("loginFormData:{}", loginFormData.value);
     await userStore.login(loginFormData.value);
 
     // 3. 获取用户信息（包含用户角色，用于路由生成）

@@ -23,12 +23,12 @@ httpRequest.interceptors.request.use(
     const accessToken = Auth.getAccessToken();
 
     // 调试日志
-    console.log('accessToken类型:', typeof accessToken);
-    console.log('accessToken值:', accessToken);
-    console.log('accessToken是否严格等于undefined:', accessToken === undefined);
-    console.log('accessToken是否严格等于"undefined":', accessToken === 'undefined');
-    console.log('accessToken是否为假值:', !accessToken);
-    console.log('accessToken长度:', accessToken ? accessToken.length : 0);
+    // console.log('accessToken类型:', typeof accessToken);
+    // console.log('accessToken值:', accessToken);
+    // console.log('accessToken是否严格等于undefined:', accessToken === undefined);
+    // console.log('accessToken是否严格等于"undefined":', accessToken === 'undefined');
+    // console.log('accessToken是否为假值:', !accessToken);
+    // console.log('accessToken长度:', accessToken ? accessToken.length : 0);
 
     // 如果 Authorization 设置为 no-auth，则不携带 Token
     if (config.headers.Authorization !== "no-auth" && accessToken) {

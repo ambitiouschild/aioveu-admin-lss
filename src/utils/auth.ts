@@ -32,8 +32,8 @@ export class Auth {
       : Storage.sessionGet<string>(AUTH_KEYS.ACCESS_TOKEN, "");
 
     // 调试日志
-    console.info('Auth.getAccessToken - 原始token:', token);
-    console.info('Auth.getAccessToken - token类型:', typeof token);
+    // console.info('Auth.getAccessToken - 原始token:', token);
+    // console.info('Auth.getAccessToken - token类型:', typeof token);
 
     return isRememberMe
       ? Storage.get(AUTH_KEYS.ACCESS_TOKEN, "")

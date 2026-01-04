@@ -24,15 +24,15 @@ export const useUserStore = defineStore("user", () => {
       AuthAPI.login(LoginFormData)
         .then((data) => {
 
-          console.log("data是什么：", data);
+          // console.log("data是什么：", data);
 
 
           // const { accessToken, refreshToken } = data;
           const accessToken = data.access_token;
           const refreshToken= data.refresh_token ;
 
-          console.log("accessToken是什么：", accessToken);
-          console.log("refreshToken是什么：", refreshToken);
+          // console.log("accessToken是什么：", accessToken);
+          // console.log("refreshToken是什么：", refreshToken);
           // 保存记住我状态和token
           rememberMe.value = LoginFormData.rememberMe;
           Auth.setTokens(accessToken, refreshToken, rememberMe.value);
