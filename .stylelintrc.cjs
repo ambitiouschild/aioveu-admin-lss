@@ -4,7 +4,7 @@ module.exports = {
     "stylelint-config-recommended-scss",
     "stylelint-config-recommended-vue/scss",
     "stylelint-config-html/vue",
-    "stylelint-config-recess-order",
+    "stylelint-config-recess-aioveuMallOmsOrder",
   ],
 
   plugins: [

@@ -123,7 +123,7 @@
     <el-card shadow="never">
       <div class="mb-10px">
         <el-button
-            v-hasPerm="['aioveuSalesOrderDetail:aioveu-sales-order-detail:add']"
+            v-hasPerm="['aioveuSalesOrderDetail:aioveu-sales-aioveuMallOmsOrder-detail:add']"
             type="success"
             @click="handleOpenDialog()"
         >
@@ -131,7 +131,7 @@
           新增
         </el-button>
         <el-button
-            v-hasPerm="['aioveuSalesOrderDetail:aioveu-sales-order-detail:delete']"
+            v-hasPerm="['aioveuSalesOrderDetail:aioveu-sales-aioveuMallOmsOrder-detail:delete']"
             type="danger"
             :disabled="removeIds.length === 0"
             @click="handleDelete()"
@@ -276,7 +276,7 @@
         <el-table-column fixed="right" label="操作" width="220">
           <template #default="scope">
             <el-button
-                v-hasPerm="['aioveuSalesOrderDetail:aioveu-sales-order-detail:edit']"
+                v-hasPerm="['aioveuSalesOrderDetail:aioveu-sales-aioveuMallOmsOrder-detail:edit']"
                 type="primary"
                 size="small"
                 link
@@ -286,7 +286,7 @@
               编辑
             </el-button>
             <el-button
-                v-hasPerm="['aioveuSalesOrderDetail:aioveu-sales-order-detail:delete']"
+                v-hasPerm="['aioveuSalesOrderDetail:aioveu-sales-aioveuMallOmsOrder-detail:delete']"
                 type="danger"
                 size="small"
                 link

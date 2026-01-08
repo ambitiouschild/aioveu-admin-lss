@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const AIOVEULAUNDRYORDER_BASE_URL = "/api/v1/aioveu-laundry-order";
+const AIOVEULAUNDRYORDER_BASE_URL = "/api/v1/aioveu-laundry-aioveuMallOmsOrder";
 
 const AioveuLaundryOrderAPI = {
     /** 获取洗衣订单分页数据 */

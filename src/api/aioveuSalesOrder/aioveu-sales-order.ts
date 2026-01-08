@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const AIOVEUSALESORDER_BASE_URL = "/api/v1/aioveu-sales-order";
+const AIOVEUSALESORDER_BASE_URL = "/api/v1/aioveu-sales-aioveuMallOmsOrder";
 
 const AioveuSalesOrderAPI = {
     /** 获取销售订单分页数据 */
