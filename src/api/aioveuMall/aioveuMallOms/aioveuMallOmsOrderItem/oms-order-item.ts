@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const OMSORDERITEM_BASE_URL = "/api/v1/oms-order-item";
+const OMSORDERITEM_BASE_URL = "/aioveu-oms/api/v1/oms-order-item";
 
 const OmsOrderItemAPI = {
     /** 获取订单商品信息分页数据 */
@@ -80,6 +80,9 @@ export interface OmsOrderItemPageQuery extends PageQuery {
 
 /** 订单商品信息表单对象 */
 export interface OmsOrderItemForm {
+
+    /** 商品编号 */
+    id?:  number;
     /** 商品名称 */
     spuName?:  string;
     /** 商品ID */
