@@ -1,0 +1,145 @@
+import request from "@/utils/request";
+
+const PMSSPU_BASE_URL = "/aioveu-pms/api/v1/pms-spu";
+
+const PmsSpuAPI = {
+    /** 获取商品分页数据 */
+    getPage(queryParams?: PmsSpuPageQuery) {
+        return request<any, PageResult<PmsSpuPageVO[]>>({
+            url: `${PMSSPU_BASE_URL}/page`,
+            method: "get",
+            params: queryParams,
+        });
+    },
+    /**
+     * 获取商品表单数据
+     *
+     * @param id 商品ID
+     * @returns 商品表单数据
+     */
+    getFormData(id: number) {
+        return request<any, PmsSpuForm>({
+            url: `${PMSSPU_BASE_URL}/${id}/form`,
+            method: "get",
+        });
+    },
+
+    /**
+     *  添加商品
+     *
+     *  @param data 商品表单数据
+     */
+    add(data: PmsSpuForm) {
+        return request({
+            url: `${PMSSPU_BASE_URL}`,
+            method: "post",
+            data: data,
+        });
+    },
+
+    /**
+     * 更新商品
+     *
+     * @param id 商品ID
+     * @param data 商品表单数据
+     */
+     update(id: number, data: PmsSpuForm) {
+        return request({
+            url: `${PMSSPU_BASE_URL}/${id}`,
+            method: "put",
+            data: data,
+        });
+    },
+
+    /**
+     * 批量删除商品，多个以英文逗号(,)分割
+     *
+     * @param ids 商品ID字符串，多个以英文逗号(,)分割
+     */
+     deleteByIds(ids: string) {
+        return request({
+            url: `${PMSSPU_BASE_URL}/${ids}`,
+            method: "delete",
+        });
+    }
+}
+
+export default PmsSpuAPI;
+
+/** 商品分页查询参数 */
+export interface PmsSpuPageQuery extends PageQuery {
+    /** 商品名称 */
+    name?: string;
+    /** 商品类型ID */
+    categoryId?: number;
+    /** 商品品牌ID */
+    brandId?: number;
+    /** 商品简介 */
+    description?: string;
+    /** 商品状态(0:下架 1:上架) */
+    status?: number;
+}
+
+/** 商品表单对象 */
+export interface PmsSpuForm {
+    /** 主键 */
+    id?:  number;
+    /** 商品名称 */
+    name?:  string;
+    /** 商品类型ID */
+    categoryId?:  number;
+    /** 商品品牌ID */
+    brandId?:  number;
+    /** 原价【起】 */
+    originPrice?:  number;
+    /** 现价【起】 */
+    price?:  number;
+    /** 销量 */
+    sales?:  number;
+    /** 商品主图 */
+    picUrl?:  string;
+    /** 商品图册 */
+    album?:  string;
+    /** 单位 */
+    unit?:  string;
+    /** 商品简介 */
+    description?:  string;
+    /** 商品详情 */
+    detail?:  string;
+    /** 商品状态(0:下架 1:上架) */
+    status?:  number;
+}
+
+/** 商品分页对象 */
+export interface PmsSpuPageVO {
+    /** 主键 */
+    id?: number;
+    /** 商品名称 */
+    name?: string;
+    /** 商品类型ID */
+    categoryId?: number;
+    /** 商品品牌ID */
+    brandId?: number;
+    /** 原价【起】 */
+    originPrice?: number;
+    /** 现价【起】 */
+    price?: number;
+    /** 销量 */
+    sales?: number;
+    /** 商品主图 */
+    picUrl?: string;
+    /** 商品图册 */
+    album?: string;
+    /** 单位 */
+    unit?: string;
+    /** 商品简介 */
+    description?: string;
+    /** 商品详情 */
+    detail?: string;
+    /** 商品状态(0:下架 1:上架) */
+    status?: number;
+    /** 创建时间 */
+    createTime?: Date;
+    /** 更新时间 */
+    updateTime?: Date;
+}
