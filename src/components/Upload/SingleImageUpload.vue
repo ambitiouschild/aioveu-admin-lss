@@ -226,6 +226,7 @@ const onError = (error: any) => {
   if (error.response) {
     // 服务器返回的错误
     const status = error.response.status;
+    console.log("服务器返回的错误:{}",status);
     switch(status) {
       case 413:
         errorMessage = "文件过大，请压缩后上传";
