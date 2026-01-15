@@ -10,14 +10,32 @@
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="状态(1:开启；0:关闭)" prop="status">
-                      <el-input
-                          v-model="queryParams.status"
-                          placeholder="状态(1:开启；0:关闭)"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
+<!--                <el-form-item label="状态" prop="status">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.status"-->
+<!--                          placeholder="状态"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                <el-form-item label="状态" prop="status">
+                  <el-select
+                    v-model="queryParams.status"
+                    placeholder="状态"
+                    clearable
+                    filterable
+                    @keyup.enter="handleQuery()"
+                  >
+                    <el-option
+                      v-for="item in advertStatusOptions"
+                      :key="Number(item.value)"
+                      :label="item.label"
+                      :value="Number(item.value)"
+                    />
+                  </el-select>
                 </el-form-item>
+
         <el-form-item>
           <el-button type="primary" @click="handleQuery">
             <template #icon><Search /></template>
@@ -61,13 +79,13 @@
           @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center" />
-                    <el-table-column
-                        key="id"
-                        label="广告ID"
-                        prop="id"
-                        min-width="150"
-                        align="center"
-                    />
+<!--                    <el-table-column-->
+<!--                        key="id"-->
+<!--                        label="广告ID"-->
+<!--                        prop="id"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
                     <el-table-column
                         key="title"
                         label="广告标题"
@@ -75,13 +93,50 @@
                         min-width="150"
                         align="center"
                     />
+
+
+<!--                    <el-table-column-->
+<!--                        key="imageUrl"-->
+<!--                        label="图片地址"-->
+<!--                        prop="imageUrl"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="imageUrl"
-                        label="图片地址"
-                        prop="imageUrl"
-                        min-width="150"
-                        align="center"
-                    />
+                      key="imageUrl"
+                      label="图片预览"
+                      min-width="250"
+                      align="center"
+                    >
+                      <template #default="scope">
+                        <el-image
+                          style="width: 80px; height: 80px;"
+                          :src="scope.row.imageUrl"
+                          :preview-src-list="[scope.row.imageUrl]"
+                          fit="cover"
+                          lazy
+                          :scroll-container="'.el-table__body-wrapper'"
+                          :preview-teleported="true"
+                          hide-on-click-modal
+                        >
+                          <template #placeholder>
+                            <div class="image-loading">
+                              <el-icon><Loading /></el-icon>
+                            </div>
+                          </template>
+                          <template #error>
+                            <div class="image-error">
+                              <el-icon><Picture /></el-icon>
+                              <span>加载失败</span>
+                            </div>
+                          </template>
+                        </el-image>
+                      </template>
+                    </el-table-column>
+
+
+
                     <el-table-column
                         key="startTime"
                         label="开始时间"
@@ -98,7 +153,7 @@
                     />
                     <el-table-column
                         key="status"
-                        label="状态(1:开启；0:关闭)"
+                        label="状态"
                         prop="status"
                         min-width="150"
                         align="center"
@@ -133,7 +188,7 @@
                     />
                     <el-table-column
                         key="updateTime"
-                        label="更新时间(新增有值)"
+                        label="更新时间"
                         prop="updateTime"
                         min-width="150"
                         align="center"
@@ -181,12 +236,12 @@
         @close="handleCloseDialog"
     >
       <el-form ref="dataFormRef" :model="formData" :rules="rules" label-width="100px">
-                <el-form-item label="广告ID" prop="id">
-                      <el-input
-                          v-model="formData.id"
-                          placeholder="广告ID"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="广告ID" prop="id">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.id"-->
+<!--                          placeholder="广告ID"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
                 <el-form-item label="广告标题" prop="title">
                       <el-input
@@ -195,12 +250,26 @@
                       />
                 </el-form-item>
 
-                <el-form-item label="图片地址" prop="imageUrl">
-                      <el-input
-                          v-model="formData.imageUrl"
-                          placeholder="图片地址"
-                      />
+<!--                <el-form-item label="图片地址" prop="imageUrl">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.imageUrl"-->
+<!--                          placeholder="图片地址"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                <el-form-item label="单图上传">
+                  <SingleImageUpload
+                    v-model="formData.imageUrl"
+                    :maxFileSize="5"
+                    accept=".jpg,.jpeg,.png"
+                    :style="{ width: '200px', height: '200px' }"
+                    @upload-success="handleUploadSuccess"
+                  />
+                  <div >
+                    最大图片大小：5MB，支持格式：JPG、JPEG、PNG
+                  </div>
                 </el-form-item>
+
 
                 <el-form-item label="开始时间" prop="startTime">
                       <el-date-picker
@@ -220,10 +289,10 @@
                       />
                 </el-form-item>
 
-                <el-form-item label="状态(1:开启；0:关闭)" prop="status">
+                <el-form-item label="状态" prop="status">
                       <el-input
                           v-model="formData.status"
-                          placeholder="状态(1:开启；0:关闭)"
+                          placeholder="状态"
                       />
                 </el-form-item>
 
@@ -265,7 +334,15 @@
     inheritAttrs: false,
   });
 
+  import { FileInfo } from "@/api/file.api";
+  import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
+
   import SmsAdvertAPI, { SmsAdvertPageVO, SmsAdvertForm, SmsAdvertPageQuery } from "@/api/aioveuMall/aioveuMallSms/aioveuMallSmsAdvert/sms-advert";
+
+
+  const handleUploadSuccess = (fileInfo: FileInfo) => {
+    console.log('上传成功:', fileInfo);
+  };
 
   const queryFormRef = ref();
   const dataFormRef = ref();
@@ -273,6 +350,18 @@
   const loading = ref(false);
   const removeIds = ref<number[]>([]);
   const total = ref(0);
+
+
+  const advertStatusOptions = ref<DictItemOption[]>([])
+
+
+  // 加载选项
+  function loadOptions() {
+
+    DictAPI.getDictItems('laundry_process_image_image_type').then(response => {
+      advertStatusOptions.value = response
+    })
+  }
 
   const queryParams = reactive<SmsAdvertPageQuery>({
     pageNum: 1,
@@ -401,5 +490,7 @@
 
   onMounted(() => {
     handleQuery();
+    loadOptions()
+
   });
 </script>
