@@ -15,7 +15,7 @@ const FileAPI = {
       method: "post",
       data: formData,
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "multipart/form-data",  // 确保正确设置
       },
     });
   },

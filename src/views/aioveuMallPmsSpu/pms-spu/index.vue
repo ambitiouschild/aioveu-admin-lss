@@ -10,22 +10,59 @@
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="商品类型ID" prop="categoryId">
-                      <el-input
-                          v-model="queryParams.categoryId"
-                          placeholder="商品类型ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
+<!--                <el-form-item label="商品类型ID" prop="categoryId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.categoryId"-->
+<!--                          placeholder="商品类型ID"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                <el-form-item label="商品类型" prop="categoryId">
+                  <el-select
+                    v-model="queryParams.categoryId"
+                    placeholder="商品类型"
+                    clearable
+                    filterable
+                    @keyup.enter="handleQuery()"
+                  >
+                    <el-option
+                      v-for="item in categoryOptions"
+                      :key="Number(item.value)"
+                      :label="item.label"
+                      :value="Number(item.value)"
+                    />
+                  </el-select>
                 </el-form-item>
-                <el-form-item label="商品品牌ID" prop="brandId">
-                      <el-input
-                          v-model="queryParams.brandId"
-                          placeholder="商品品牌ID"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
+
+
+<!--                <el-form-item label="商品品牌ID" prop="brandId">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.brandId"-->
+<!--                          placeholder="商品品牌ID"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                <el-form-item label="商品品牌" prop="brandId">
+                  <el-select
+                    v-model="queryParams.brandId"
+                    placeholder="请选择商品品牌"
+                    clearable
+                    filterable
+                    @keyup.enter="handleQuery()"
+                  >
+                    <el-option
+                      v-for="item in brandOption"
+                      :key="item.orderId"
+                      :label="item.orderNo"
+                      :value="item.orderId"
+                    />
+                  </el-select>
                 </el-form-item>
+
                 <el-form-item label="商品简介" prop="description">
                       <el-input
                           v-model="queryParams.description"
@@ -34,14 +71,35 @@
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="商品状态(0:下架 1:上架)" prop="status">
-                      <el-input
-                          v-model="queryParams.status"
-                          placeholder="商品状态(0:下架 1:上架)"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
+
+<!--                <el-form-item label="商品状态(0:下架 1:上架)" prop="status">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.status"-->
+<!--                          placeholder="商品状态(0:下架 1:上架)"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+
+
+<!--                </el-form-item>-->
+
+                <el-form-item label="商品状态" prop="status">
+                  <el-select
+                    v-model="queryParams.status"
+                    placeholder="商品状态"
+                    clearable
+                    filterable
+                    @keyup.enter="handleQuery()"
+                  >
+                    <el-option
+                      v-for="item in productStatusOptions"
+                      :key="Number(item.value)"
+                      :label="item.label"
+                      :value="Number(item.value)"
+                    />
+                  </el-select>
                 </el-form-item>
+
         <el-form-item>
           <el-button type="primary" @click="handleQuery">
             <template #icon><Search /></template>
@@ -85,13 +143,13 @@
           @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center" />
-                    <el-table-column
-                        key="id"
-                        label="主键"
-                        prop="id"
-                        min-width="150"
-                        align="center"
-                    />
+<!--                    <el-table-column-->
+<!--                        key="id"-->
+<!--                        label="主键"-->
+<!--                        prop="id"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
                     <el-table-column
                         key="name"
                         label="商品名称"
@@ -134,20 +192,87 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="picUrl"-->
+<!--                        label="商品主图"-->
+<!--                        prop="picUrl"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="picUrl"
-                        label="商品主图"
-                        prop="picUrl"
-                        min-width="150"
-                        align="center"
-                    />
-                    <el-table-column
+                      key="picUrl"
+                      label="商品主图"
+                      min-width="250"
+                      align="center"
+                    >
+                      <template #default="scope">
+                        <el-image
+                          style="width: 80px; height: 80px;"
+                          :src="scope.row.picUrl"
+                          :preview-src-list="[scope.row.picUrl]"
+                          fit="cover"
+                          lazy
+                          :scroll-container="'.el-table__body-wrapper'"
+                          :preview-teleported="true"
+                          hide-on-click-modal
+                        >
+                          <template #placeholder>
+                            <div class="image-loading">
+                              <el-icon><Loading /></el-icon>
+                            </div>
+                          </template>
+                          <template #error>
+                            <div class="image-error">
+                              <el-icon><Picture /></el-icon>
+                              <span>加载失败</span>
+                            </div>
+                          </template>
+                        </el-image>
+                      </template>
+                    </el-table-column>
+
+<!--                    <el-table-column-->
+<!--                        key="album"-->
+<!--                        label="商品图册"-->
+<!--                        prop="album"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
+                      <el-table-column
                         key="album"
                         label="商品图册"
                         prop="album"
                         min-width="150"
                         align="center"
-                    />
+                      >
+                        <template #default="{ row }">
+                          <div v-if="row.album && row.album.length > 0" class="album-preview">
+                            <!-- 只显示第一张图片 -->
+                            <el-image
+                              :src="row.album[0]"
+                              fit="cover"
+                              class="main-image"
+                              :preview-src-list="row.album"
+                              :initial-index="0"
+                              :preview-teleported="true"
+                              hide-on-click-modal
+                            />
+
+                            <!-- 图片数量提示 -->
+                            <div v-if="row.album.length > 1" class="image-count">
+                              <el-tag size="small" type="info">
+                                {{ row.album.length }}张
+                              </el-tag>
+                            </div>
+                          </div>
+                          <span v-else class="empty-text">暂无图片</span>
+                        </template>
+                      </el-table-column>
+
+
+
                     <el-table-column
                         key="unit"
                         label="单位"
@@ -155,23 +280,79 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="description"-->
+<!--                        label="商品简介"-->
+<!--                        prop="description"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="description"
-                        label="商品简介"
-                        prop="description"
-                        min-width="150"
-                        align="center"
-                    />
-                    <el-table-column
-                        key="detail"
-                        label="商品详情"
-                        prop="detail"
-                        min-width="150"
-                        align="center"
-                    />
+                      key="description"
+                      label="商品简介"
+                      prop="description"
+                      min-width="150"
+                      align="center"
+                    >
+                      <template #default="{ row }">
+                        <el-tooltip
+                          :content="row.description || '暂无简介'"
+                          placement="top"
+                          :disabled="!row.description || row.description.length <= 20"
+                        >
+                        <span class="description-text">
+                            {{ formatDescription(row.description) }}
+                        </span>
+                        </el-tooltip>
+                      </template>
+                    </el-table-column>
+
+
+<!--                    <el-table-column-->
+<!--                        key="detail"-->
+<!--                        label="商品详情"-->
+<!--                        prop="detail"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
+
+<!--        完整的商品详情展示组件-->
+        <!--    ==================================    -->
+                        <el-table-column
+                          key="detail"
+                          label="商品详情"
+                          prop="detail"
+                          min-width="200"
+                          align="center"
+                        >
+                          <template #default="{ row }">
+                            <ProductDetailPreview
+                              :detail="row.detail"
+                              @preview="handlePreview"
+                            />
+                          </template>
+                        </el-table-column>
+
+                        <!-- 详情预览对话框 -->
+                        <el-dialog
+                          v-model="previewVisible"
+                          title="商品详情"
+                          width="80%"
+                          top="5vh"
+                        >
+                          <div
+                            class="detail-full-content"
+                            v-html="currentDetail"
+                          ></div>
+                        </el-dialog>
+
+<!--    ==================================    -->
+
                     <el-table-column
                         key="status"
-                        label="商品状态(0:下架 1:上架)"
+                        label="商品状态"
                         prop="status"
                         min-width="150"
                         align="center"
@@ -233,12 +414,12 @@
         @close="handleCloseDialog"
     >
       <el-form ref="dataFormRef" :model="formData" :rules="rules" label-width="100px">
-                <el-form-item label="主键" prop="id">
-                      <el-input
-                          v-model="formData.id"
-                          placeholder="主键"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="主键" prop="id">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.id"-->
+<!--                          placeholder="主键"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
                 <el-form-item label="商品名称" prop="name">
                       <el-input
@@ -282,19 +463,43 @@
                       />
                 </el-form-item>
 
-                <el-form-item label="商品主图" prop="picUrl">
-                      <el-input
-                          v-model="formData.picUrl"
-                          placeholder="商品主图"
-                      />
-                </el-form-item>
+<!--                <el-form-item label="商品主图" prop="picUrl">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.picUrl"-->
+<!--                          placeholder="商品主图"-->
+<!--                      />-->
+<!--                </el-form-item>-->
 
-                <el-form-item label="商品图册" prop="album">
-                      <el-input
-                          v-model="formData.album"
-                          placeholder="商品图册"
-                      />
-                </el-form-item>
+                  <el-form-item label="商品主图">
+                    <SingleImageUpload
+                      v-model="formData.picUrl"
+                      :maxFileSize="5"
+                      accept=".jpg,.jpeg,.png"
+                      @upload-success="handleUploadSuccess"
+                    />
+                    <div >
+                      最大图片大小：5MB，支持格式：JPG、JPEG、PNG
+                    </div>
+                  </el-form-item>
+
+
+<!--                <el-form-item label="商品图册" prop="album">-->
+<!--                      <el-input-->
+<!--                          v-model="formData.album"-->
+<!--                          placeholder="商品图册"-->
+<!--                      />-->
+<!--                </el-form-item>-->
+
+                  <!-- 完整配置示例 -->
+                  <el-form-item label="商品图册">
+                    <MultiImageUpload
+                      v-model="formData.album"
+                      :limit="10"
+                      :max-file-size="2"
+                      accept=".jpg,.jpeg,.png,.gif"
+                      :data="{ category: 'product' }"
+                    />
+                  </el-form-item>
 
                 <el-form-item label="单位" prop="unit">
                       <el-input
@@ -343,12 +548,49 @@
 
   import PmsSpuAPI, { PmsSpuPageVO, PmsSpuForm, PmsSpuPageQuery } from "@/api/aioveuMall/aioveuMallPms/aioveuMallPmsSpu/pms-spu";
 
+  import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
+  import { ref } from 'vue'
+
+  import { FileInfo } from "@/api/file.api";
+
+  const handleUploadSuccess = (fileInfo: FileInfo) => {
+    console.log('上传成功:', fileInfo);
+  };
+
   const queryFormRef = ref();
   const dataFormRef = ref();
 
   const loading = ref(false);
   const removeIds = ref<number[]>([]);
   const total = ref(0);
+
+  const categoryOptions = ref<DictItemOption[]>([])
+  const brandOption = ref<DictItemOption[]>([])
+  const productStatusOptions = ref<DictItemOption[]>([])
+
+  const previewVisible = ref(false)
+  const currentDetail = ref('')
+
+  const handlePreview = (detail : any ) => {
+    currentDetail.value = detail
+    previewVisible.value = true
+  }
+
+  // 加载选项
+  function loadOptions() {
+    // AioveuLaundryOrderAPI.getAllLaundryOrderOptions().then(response => {
+    //   orderOption.value = response
+    // })
+    // AioveuLaundryOrderItemAPI.getAllLaundryOrderItemOptions().then(response => {
+    //   itemOption.value = response
+    // })
+    // AioveuEmployeeAPI.getAllEmployeeOptions().then(response => {
+    //   employeeOption.value = response
+    // })
+    DictAPI.getDictItems('laundry_process_image_image_type').then(response => {
+      categoryOptions.value = response
+    })
+  }
 
   const queryParams = reactive<PmsSpuPageQuery>({
     pageNum: 1,
@@ -374,6 +616,21 @@
                       originPrice: [{ required: true, message: "请输入原价【起】", trigger: "blur" }],
                       price: [{ required: true, message: "请输入现价【起】", trigger: "blur" }],
   });
+
+
+  function formatDescription(description:any){
+      if (!description) return '暂无简介';
+
+      // 设置最大显示长度
+      const maxLength = 20;
+
+      if (description.length <= maxLength) {
+        return description;
+      }
+
+      // 截断并添加省略号
+      return description.substring(0, maxLength) + '...';
+    }
 
   /** 查询商品 */
   function handleQuery() {
@@ -406,6 +663,7 @@
     if (id) {
       dialog.title = "修改商品";
             PmsSpuAPI.getFormData(id).then((data) => {
+              console.log("修改商品 :{}",data);
         Object.assign(formData, data);
       });
     } else {
@@ -478,5 +736,6 @@
 
   onMounted(() => {
     handleQuery();
+    loadOptions()
   });
 </script>

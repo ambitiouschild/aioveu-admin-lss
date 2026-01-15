@@ -33,7 +33,7 @@ const PmsSpuAPI = {
         return request({
             url: `${PMSSPU_BASE_URL}`,
             method: "post",
-            data: data,
+            data,
         });
     },
 
@@ -47,7 +47,7 @@ const PmsSpuAPI = {
         return request({
             url: `${PMSSPU_BASE_URL}/${id}`,
             method: "put",
-            data: data,
+            data,
         });
     },
 
@@ -98,8 +98,12 @@ export interface PmsSpuForm {
     sales?:  number;
     /** 商品主图 */
     picUrl?:  string;
-    /** 商品图册 */
-    album?:  string;
+    // /** 商品图册 */
+    // album?:  string;
+
+ // /** 商品图册 */
+    album?: string[];  // 可选，类型是 string[]
+
     /** 单位 */
     unit?:  string;
     /** 商品简介 */
@@ -129,7 +133,7 @@ export interface PmsSpuPageVO {
     /** 商品主图 */
     picUrl?: string;
     /** 商品图册 */
-    album?: string;
+    album?: string[];  // 可选，类型是 string[]
     /** 单位 */
     unit?: string;
     /** 商品简介 */

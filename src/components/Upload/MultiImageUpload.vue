@@ -141,8 +141,11 @@ function handleBeforeUpload(file: UploadRawFile) {
 }
 
 /*
- * 上传文件
+ * 上传文件  实时上传
  */
+
+// 1. 用户选择图片
+// 2. 立即触发 handleUpload
 function handleUpload(options: UploadRequestOptions) {
   return new Promise((resolve, reject) => {
     const file = options.file;
@@ -155,6 +158,7 @@ function handleUpload(options: UploadRequestOptions) {
       formData.append(key, props.data[key]);
     });
 
+    // 3. 立即上传到服务器
     FileAPI.upload(formData)
       .then((data) => {
         resolve(data);
@@ -175,10 +179,14 @@ function handleExceed() {
 /**
  * 上传成功回调
  */
+// 4. 上传成功后立即显示
+
 const handleSuccess = (fileInfo: FileInfo, uploadFile: UploadUserFile) => {
   ElMessage.success("上传成功");
   const index = fileList.value.findIndex((file) => file.uid === uploadFile.uid);
   if (index !== -1) {
+
+    // 5. 上传成功后立即更新UI
     fileList.value[index].url = fileInfo.url;
     fileList.value[index].status = "success";
     modelValue.value[index] = fileInfo.url;
