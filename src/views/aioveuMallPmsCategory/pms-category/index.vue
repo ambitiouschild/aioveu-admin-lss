@@ -18,14 +18,31 @@
                           @keyup.enter="handleQuery()"
                       />
                 </el-form-item>
-                <el-form-item label="图标地址" prop="iconUrl">
-                      <el-input
-                          v-model="queryParams.iconUrl"
-                          placeholder="图标地址"
-                          clearable
-                          @keyup.enter="handleQuery()"
-                      />
+                <el-form-item label="父级" prop="parentId">
+                  <el-select
+                    v-model="queryParams.parentId"
+                    placeholder="请选择父级"
+                    clearable
+                    filterable
+                    @keyup.enter="handleQuery()"
+                  >
+                    <el-option
+                      v-for="item in parentIdOption"
+                      :key="item.orderId"
+                      :label="item.orderNo"
+                      :value="item.orderId"
+                    />
+                  </el-select>
                 </el-form-item>
+
+<!--                <el-form-item label="图标地址" prop="iconUrl">-->
+<!--                      <el-input-->
+<!--                          v-model="queryParams.iconUrl"-->
+<!--                          placeholder="图标地址"-->
+<!--                          clearable-->
+<!--                          @keyup.enter="handleQuery()"-->
+<!--                      />-->
+<!--                </el-form-item>-->
                 <el-form-item label="排序" prop="sort">
                       <el-input
                           v-model="queryParams.sort"
@@ -113,13 +130,47 @@
                         min-width="150"
                         align="center"
                     />
+<!--                    <el-table-column-->
+<!--                        key="iconUrl"-->
+<!--                        label="图标地址"-->
+<!--                        prop="iconUrl"-->
+<!--                        min-width="150"-->
+<!--                        align="center"-->
+<!--                    />-->
+
                     <el-table-column
-                        key="iconUrl"
-                        label="图标地址"
-                        prop="iconUrl"
-                        min-width="150"
-                        align="center"
-                    />
+                      key="imageUrl"
+                      label="图标"
+                      min-width="250"
+                      align="center"
+                    >
+                      <template #default="scope">
+                        <el-image
+                          style="width: 80px; height: 80px;"
+                          :src="scope.row.iconUrl"
+                          :preview-src-list="[scope.row.iconUrl]"
+                          fit="cover"
+                          lazy
+                          :scroll-container="'.el-table__body-wrapper'"
+                          :preview-teleported="true"
+                          hide-on-click-modal
+                        >
+                          <template #placeholder>
+                            <div class="image-loading">
+                              <el-icon><Loading /></el-icon>
+                            </div>
+                          </template>
+                          <template #error>
+                            <div class="image-error">
+                              <el-icon><Picture /></el-icon>
+                              <span>加载失败</span>
+                            </div>
+                          </template>
+                        </el-image>
+                      </template>
+                    </el-table-column>
+
+
                     <el-table-column
                         key="sort"
                         label="排序"
@@ -129,7 +180,7 @@
                     />
                     <el-table-column
                         key="visible"
-                        label="显示状态:( 0:隐藏 1:显示)"
+                        label="显示状态"
                         prop="visible"
                         min-width="150"
                         align="center"
@@ -226,6 +277,21 @@
                       />
                 </el-form-item>
 
+                <el-form-item label="单图上传">
+                  <SingleImageUpload
+                    v-model="formData.iconUrl"
+                    :maxFileSize="5"
+                    accept=".jpg,.jpeg,.png"
+                    :style="{ width: '200px', height: '200px' }"
+                  />
+                  <div >
+                    最大图片大小：5MB，支持格式：JPG、JPEG、PNG
+                  </div>
+                </el-form-item>
+
+
+
+
                 <el-form-item label="排序" prop="sort">
                       <el-input
                           v-model="formData.sort"
@@ -258,6 +324,10 @@
   });
 
   import PmsCategoryAPI, { PmsCategoryPageVO, PmsCategoryForm, PmsCategoryPageQuery } from "@/api/aioveuMall/aioveuMallPms/aioveuMallPmsCategory/pms-category";
+  import DictAPI,{ DictItemOption } from '@/api/system/dict.api'
+
+  // 新增：选项
+  const parentIdOption = ref<DictItemOption[]>([]);  // 新增：选项
 
   const queryFormRef = ref();
   const dataFormRef = ref();
@@ -271,6 +341,21 @@
     pageSize: 10,
   });
 
+  // 加载选项
+  function loadOptions() {
+    // AioveuLaundryOrderAPI.getAllLaundryOrderOptions().then(response => {
+    //   orderOption.value = response
+    // })
+    // AioveuLaundryOrderItemAPI.getAllLaundryOrderItemOptions().then(response => {
+    //   itemOption.value = response
+    // })
+    // AioveuEmployeeAPI.getAllEmployeeOptions().then(response => {
+    //   employeeOption.value = response
+    // })
+    DictAPI.getDictItems('laundry_process_image_image_type').then(response => {
+      parentIdOption.value = response
+    })
+  }
   // 商品分类表格数据
   const pageData = ref<PmsCategoryPageVO[]>([]);
 
@@ -392,5 +477,8 @@
 
   onMounted(() => {
     handleQuery();
+
+    loadOptions()
+
   });
 </script>

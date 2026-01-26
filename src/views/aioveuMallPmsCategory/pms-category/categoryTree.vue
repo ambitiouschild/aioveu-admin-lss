@@ -18,7 +18,6 @@
           <!--  卡片头部插槽  使用 svg-icon 组件显示菜单图标-->
 
           <template #header>
-            <svg-icon icon-class="menu" />  <!-- 图标组件 -->
             商品分类    <!-- 标题 -->
           </template>
 
@@ -45,7 +44,7 @@
               卡片头部插槽
               显示当前选中分类的名称
             -->
-            <svg-icon icon-class="menu" />
+<!--            <svg-icon icon-class="menu" />-->
             <!--
               显示当前选中分类的名称
               如果未选择分类，显示" 规格属性"
@@ -102,20 +101,21 @@ defineOptions({
   inheritAttrs: false,  // 不自动继承父组件传递的非 prop 属性
 });
 
-// 响应式状态管理
-const state = reactive({
+import { ref, onUnmounted } from 'vue'
 
+// ❌ 问题代码
+// 使用 ref 而不是 reactive + toRefs
+const category  = ref({
   // 当前选中的商品分类信息
-  category: {
     id: undefined,  // 分类ID
     name: "",        // 分类名称
     childrenLen: 0,     // 子分类数量
-  },
 });
 
-// 将响应式状态解构为ref，方便在模板中使用
-const { category } = toRefs(state);
-
+// 组件引用
+const categoryRef = ref()
+const specificationRef = ref()
+const attributeRef = ref()
 
 /**
  * 处理分类点击事件
@@ -126,7 +126,7 @@ function handleCategoryClick(categoryRow: any) {
 
   // 如果有选中分类，更新当前选中的分类信息
   if (categoryRow) {
-    state.category = {
+    category.value = {
       id: categoryRow.id,   // 分类ID
       name: categoryRow.name,   // 分类名称
       childrenLen: categoryRow.children.length,  // 子分类数量
@@ -134,13 +134,57 @@ function handleCategoryClick(categoryRow: any) {
   } else {
 
     // 如果没有选中分类（如取消选择），重置分类信息
-    state.category = {
+    category.value = {
       id: undefined,
       name: "",
       childrenLen: 0,
     };
   }
 }
+
+/**
+ * 组件卸载时的清理
+ */
+onUnmounted(() => {
+  console.log('🗑️ CategoryPage 组件卸载')
+
+  // 手动清理子组件引用
+  if (categoryRef.value) {
+    const categoryTree = categoryRef.value
+
+    // 调用子组件的清理方法（如果子组件暴露了）
+    if (categoryTree.$exposed?.cleanup) {
+      categoryTree.$exposed.cleanup()
+    }
+
+    // 清理 DOM
+    if (categoryTree.$el?.parentNode) {
+      const parent = categoryTree.$el.parentNode
+      while (parent.firstChild) {
+        parent.removeChild(parent.firstChild)
+      }
+    }
+
+    categoryRef.value = null
+  }
+
+  specificationRef.value = null
+  attributeRef.value = null
+
+  // 清空 category 数据
+  category.value = {
+    id: undefined,
+    name: "",
+    childrenLen: 0,
+  }
+
+  // 强制触发垃圾回收（如果支持）
+  if (window.gc) {
+    window.gc()
+  }
+})
+
+
 </script>
 
 

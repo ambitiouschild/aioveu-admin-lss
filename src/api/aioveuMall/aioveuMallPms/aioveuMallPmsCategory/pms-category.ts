@@ -23,7 +23,7 @@ const PmsCategoryAPI = {
 
     /** 获取商品分类分页数据 */
     getCategoryOptions() {
-      return request<any, PageResult<PmsCategoryPageVO[]>>({
+      return request({
         url: `${PMSCATEGORY_BASE_URL}/options`,
         method: "get",
       });

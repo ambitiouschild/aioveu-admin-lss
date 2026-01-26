@@ -5,12 +5,22 @@ const PMSSPU_BASE_URL = "/aioveu-pms/api/v1/pms-spu";
 const PmsSpuAPI = {
     /** 获取商品分页数据 */
     getPage(queryParams?: PmsSpuPageQuery) {
-        return request<any, PageResult<PmsSpuPageVO[]>>({
+        return request({
             url: `${PMSSPU_BASE_URL}/page`,
             method: "get",
             params: queryParams,
         });
     },
+
+  /** 获取商品详情 */
+  getSpuDetail(id: string) {
+    return request({
+      url: `${PMSSPU_BASE_URL}/page/${id}/detail`,
+      method: "get",
+    });
+  },
+
+
     /**
      * 获取商品表单数据
      *
@@ -146,4 +156,14 @@ export interface PmsSpuPageVO {
     createTime?: Date;
     /** 更新时间 */
     updateTime?: Date;
+
+  attrList: [];           // 商品属性列表
+  specList: [];            // 商品规格列表
+  skuList: [];             // 商品SKU列表
+
+  stock: number;
+
+  categoryName: string;// 总库存
+
+  brandName: string;
 }

@@ -1,20 +1,8 @@
 <template>
-
   <!-- 组件容器 -->
-  <div class="component-container">
-
+  <!-- 关键：添加 v-if 强制重新渲染 -->
+  <div v-if="showCategoryTree" class="component-container">
     <!-- 树形分类组件 -->
-    <!-- 加载状态显示 -->
-    <!-- 树形数据 -->
-    <!-- 节点标签使用name字段 -->
-    <!-- 子节点使用children字段 -->
-    <!-- 不禁用任何节点 -->
-
-
-    <!-- 节点的唯一标识字段 -->
-    <!-- 默认展开所有节点 -->
-    <!-- 手风琴模式，一次只展开一个同级节点 -->
-    <!-- 节点点击事件 -->
     <el-tree
       ref="categoryTreeRef"
       v-loading="loading"
@@ -27,26 +15,21 @@
       :accordion="true"
       @node-click="handleNodeClick"
     >
-
       <!-- 自定义节点内容 -->
       <template #default="scope">
         <div class="category_node">
           <!-- 左侧：节点内容显示 -->
           <div>
-            <!-- 只有三级分类（叶子节点）显示图标 -->
             <!-- 三级分类显示图标 -->
-            <!-- 图标URL -->
-            <!-- 图标样式 -->
             <el-image
-              v-show="scope.data.level == 3"
+              v-show="scope.data.level === 3"
               :src="scope.data.iconUrl"
               class="category_node_img"
             >
               <!-- 图标加载失败的占位符 -->
-              <!-- 图片占位图标 -->
               <template #error>
                 <div class="image-slot">
-                  <i-ep-picture />
+                  <el-icon><Picture /></el-icon>
                 </div>
               </template>
             </el-image>
@@ -56,16 +39,15 @@
 
           <!-- 右侧：操作按钮 -->
           <div>
-
-            <!-- 非三级分类显示新增按钮（最多三级分类） -->
-            <!-- 阻止事件冒泡 -->
+            <!-- 非三级分类显示新增按钮 -->
             <el-button
-              v-show="scope.data.level != 3"
+              v-show="scope.data.level !== 3"
               type="success"
               link
               @click.stop="handleAdd(scope.data)"
-            >新增</el-button
             >
+              新增
+            </el-button>
 
             <!-- 非根节点显示编辑按钮 -->
             <el-button
@@ -73,10 +55,11 @@
               type="warning"
               link
               @click.stop="handleUpdate(scope.data)"
-            >编辑
+            >
+              编辑
             </el-button>
 
-            <!-- 叶子节点（没有子节点）显示删除按钮 -->
+            <!-- 叶子节点显示删除按钮 -->
             <el-button
               v-show="
                 scope.data.id &&
@@ -85,17 +68,16 @@
               type="danger"
               link
               @click.stop="handleDelete(scope.data)"
-            >删除</el-button
             >
+              删除
+            </el-button>
           </div>
         </div>
       </template>
     </el-tree>
 
-
     <!-- 新增/编辑分类对话框 -->
-    <el-dialog v-model="dialog.visible" :title="dialog.title" width="750px">
-
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="750px">
       <!-- 表单 -->
       <el-form
         ref="dataFormRef"
@@ -103,10 +85,9 @@
         :rules="rules"
         label-width="100px"
       >
-
         <!-- 上级分类（只读） -->
         <el-form-item label="上级分类" prop="parentId">
-          <el-input v-model="parent.name" readonly />
+          <el-input v-model="parentCategory.name" readonly />
         </el-form-item>
 
         <!-- 分类名称 -->
@@ -114,12 +95,23 @@
           <el-input v-model="formData.name" />
         </el-form-item>
 
+        <!-- 分类图标上传 -->
+<!--        <el-form-item label="分类图标" prop="iconUrl">-->
+<!--          <single-upload v-model="formData.iconUrl" />-->
+<!--        </el-form-item>-->
 
         <!-- 分类图标上传 -->
-        <el-form-item label="分类图标" prop="iconUrl">
-          <single-upload v-model="formData.iconUrl" />
+        <el-form-item label="分类图标">
+          <SingleImageUpload
+            v-model="formData.iconUrl"
+            :maxFileSize="5"
+            accept=".jpg,.jpeg,.png"
+            :style="{ width: '200px', height: '200px' }"
+          />
+          <div >
+            最大图片大小：5MB，支持格式：JPG、JPEG、PNG
+          </div>
         </el-form-item>
-
 
         <!-- 显示状态 -->
         <el-form-item label="显示状态" prop="visible">
@@ -145,288 +137,312 @@
     </el-dialog>
   </div>
 </template>
-<!--
-  商品分类管理组件
-  功能：树形结构展示商品分类，支持分类的增删改查操作
-  特点：
-    1. 支持最多三级分类结构
-    2. 通过树形结构直观展示分类层级
-    3. 支持拖拽排序（如需要可实现）
-    4. 使用Element Plus的ElTree组件
--->
 
 <script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
+import PmsCategoryAPI from '@/api/aioveuMall/aioveuMallPms/aioveuMallPmsCategory/pms-category'
 
-// 导入API函数
-import
-  PmsCategoryAPI
-  from "@/api/aioveuMall/aioveuMallPms/aioveuMallPmsCategory/pms-category";
+// 定义组件事件
+const emit = defineEmits<{
+  (e: 'category-click', data: any): void
+}>()
 
-// 定义组件事件，用于向父组件传递当前选中的分类
-const emit = defineEmits(["category-click"]);
+const showCategoryTree = ref(true)
 
 // 定义组件引用
-const categoryTreeRef = ref(ElTree);  // 树形组件引用
-const dataFormRef = ref(ElForm);    // 表单组件引用
+const categoryTreeRef = ref<InstanceType<typeof ElTree>>()
+const dataFormRef = ref<FormInstance>()
 
+// 响应式数据
+const loading = ref(true)
+const categoryOptions = ref<any[]>([])
 
-// 响应式状态管理
-const state = reactive({
-  loading: true,  // 加载状态
-  ids: [],       // 选中的分类ID数组（用于批量操作）
-  queryParam: {},    // 查询参数
+// 表单数据
+const formData = reactive({
+  id: undefined as number | undefined,
+  name: '',
+  parentId: 0,
+  level: undefined as number | undefined,
+  iconUrl: '',
+  visible: 1,
+  sort: 100
+})
 
-  // 分类树形数据
-  categoryOptions: [] as Array<any>,
+// 表单验证规则
+const rules = reactive<FormRules>({
+  name: [
+    { required: true, message: '请输入分类名称', trigger: 'blur' }
+  ],
+  parentId: [
+    { required: true, message: '请选择上级分类', trigger: 'blur' }
+  ]
+})
 
-  // 表单数据模型
-  formData: {
-    id: undefined,    // 分类ID
-    name: undefined,  // 分类名称
-    parentId: 0,     // 父级分类ID，0表示根分类
-    level: undefined,  // 分类层级（1,2,3）
-    iconUrl: undefined,   // 分类图标URL
-    visible: 1,     // 显示状态：1显示，0隐藏
-    sort: 100,    // 排序值
-  },
+// 对话框控制
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
 
-  // 表单验证规则
-  rules: {
-    parentId: [
-      {
-        required: true,
-        message: "请选择上级分类",
-        trigger: "blur",
-      },
-    ],
-    name: [
-      {
-        required: true,
-        message: "请输入分类名称",
-        trigger: "blur",
-      },
-    ],
-  },
+// 父级分类和当前分类
+const parentCategory = reactive({
+  id: 0,
+  name: '全部分类',
+  level: 0
+})
 
-  // 对话框控制
-  dialog: {
-    title: "",    // 对话框标题
-    visible: false,   // 对话框显示/隐藏
-  },
-  parent: {} as any,    // 当前选中分类的父级信息
-  current: {} as any,   // 当前选中的分类信息
-});
-
-// 从state中解构出需要在模板中使用的响应式属性
-const { loading, categoryOptions, formData, rules, dialog, parent } =
-  toRefs(state);
-
+const currentCategory = ref<any>({})
 
 /**
  * 查询分类数据
- * 从服务器获取分类列表，并构建树形结构
  */
-function handleQuery() {
-  state.loading = true;   // 显示加载状态
-  PmsCategoryAPI.getListCategories(state.queryParam).then((response) => {
+const handleQuery = async () => {
+  loading.value = true
+  try {
+    const response = await PmsCategoryAPI.getListCategories({})
 
-    // 构建树形数据，添加一个虚拟的根节点"全部分类"
-    state.categoryOptions = [
-      {
-        id: 0,                  // 根节点ID设为0
-        name: "全部分类",        // 根节点名称
-        parentId: 0,            // 父节点为自身
-        level: 0,                // 层级为0
-        children: response.data,   // 实际的分类数据作为子节点
-      },
-    ];
-    state.loading = false;         // 隐藏加载状态
-  });
-}
+    console.log("分类数据:", response)
 
-
-/**
- * 树节点点击事件处理
- * @param row - 点击的分类节点数据
- */
-function handleNodeClick(row: any) {
-
-  // 获取树形组件实例
-  const categoryTree = unref(categoryTreeRef);
-
-  // 获取当前节点的父节点
-  const parentNode = categoryTree.getNode(row.parentId);
-
-
-  // 更新父级分类信息
-  state.parent = {
-    id: parentNode.key,    // 父节点ID
-    name: parentNode.label,   // 父节点名称
-    level: row.level,     // 父节点层级
-  };
-
-  // 深度拷贝当前分类信息（避免引用问题）
-  state.current = JSON.parse(JSON.stringify(row));
-
-  // 向父组件发射事件，传递当前选中的分类
-  emit("category-click", row);
-}
-
-
-/**
- * 新增分类
- * @param row - 要在此分类下新增子分类的节点数据
- */
-function handleAdd(row: any) {
-
-  // 设置对话框标题和显示状态
-  state.dialog = {
-    title: "新增商品分类",
-    visible: true,
-  };
-
-  // 重置表单ID
-  state.formData.id = undefined;
-
-  // 如果传入了行数据，说明是点击某个分类的"新增"按钮
-  if (row.id != null) {
-    // 行点击新增
-    state.parent = {
-      id: row.id,
-      name: row.name,
-      level: row.level,
-    };
+    // 构建树形数据，添加虚拟根节点"全部分类"
+    if (Array.isArray(response)) {
+      categoryOptions.value = [{
+        id: 0,
+        name: '全部分类',
+        parentId: 0,
+        level: 0,
+        children: response
+      }]
+    } else if (response && Array.isArray(response.data)) {
+      categoryOptions.value = [{
+        id: 0,
+        name: '全部分类',
+        parentId: 0,
+        level: 0,
+        children: response.data
+      }]
+    } else {
+      console.error('返回数据格式不正确:', response)
+      categoryOptions.value = []
+    }
+  } catch (error) {
+    console.error('查询分类数据失败:', error)
+    ElMessage.error('获取分类数据失败')
+  } finally {
+    loading.value = false
   }
 }
 
+/**
+ * 树节点点击事件处理
+ */
+const handleNodeClick = (row: any) => {
+  if (!categoryTreeRef.value) return
+
+
+  // 确保 parentId 是数字类型
+  const parentId = Number(row.parentId)
+
+  // 获取当前节点的父节点
+
+  //ElTree的 node-key被设置为 "id"，这意味着节点的 key 应该是数字类型。但是在使用 getNode(row.parentId)时，如果 row.parentId是字符串类型，就会导致类型不匹配。
+  const parentNode = categoryTreeRef.value.getNode(parentId)
+
+  // 更新父级分类信息
+  if (parentNode) {
+    parentCategory.id = parentId
+    parentCategory.name = parentNode.label
+    parentCategory.level = row.level
+  } else {
+    // 如果没有父节点（可能是根节点），清空父级信息
+    parentCategory.id = 0
+    parentCategory.name = ''
+    parentCategory.level = 0
+  }
+
+  // 保存当前分类信息
+  currentCategory.value = { ...row }
+
+  // 向父组件发射事件
+  emit('category-click', row)
+}
+
+/**
+ * 新增分类
+ */
+const handleAdd = (row: any) => {
+  dialogTitle.value = '新增商品分类'
+  dialogVisible.value = true
+
+  // 重置表单
+  resetForm()
+  formData.id = undefined
+
+  if (row && row.id != null) {
+    // 设置父级分类
+    parentCategory.id = row.id
+    parentCategory.name = row.name
+    parentCategory.level = row.level
+  }
+}
 
 /**
  * 修改分类
- * @param row - 要修改的分类节点数据
  */
-function handleUpdate(row: any) {
-
+const handleUpdate = (row: any) => {
   // 先触发节点点击，获取父节点信息
-  handleNodeClick(row);
+  handleNodeClick(row)
 
-  // 设置对话框标题和显示状态
-  state.dialog = {
-    title: "修改商品分类",
-    visible: true,
-  };
+  dialogTitle.value = '修改商品分类'
+  dialogVisible.value = true
 
   // 将当前分类数据复制到表单中
-  Object.assign(state.formData, state.current);
+  Object.assign(formData, {
+    id: row.id,
+    name: row.name,
+    parentId: row.parentId,
+    level: row.level,
+    iconUrl: row.iconUrl || '',
+    visible: row.visible || 1,
+    sort: row.sort || 100
+  })
 }
-
 
 /**
- * 提交表单（新增或修改）
+ * 提交表单
  */
-function submitForm() {
+const submitForm = async () => {
+  if (!dataFormRef.value) return
 
-  // 表单验证
-  dataFormRef.value.validate((valid: any) => {
-    if (valid) {
+  try {
+    const valid = await dataFormRef.value.validate()
+    if (!valid) return
 
-      // 如果有ID，执行更新操作
-      if (state.formData.id) {
-        PmsCategoryAPI.update(state.formData.id, state.formData).then(() => {
-          ElMessage.success("修改成功");
-          closeDialog();   // 关闭对话框
-          handleQuery();  // 刷新数据
-        });
-      } else {
-
-        // 新增操作
-        const parentCategory = state.parent as any;
-
-        // 设置父级ID和层级
-        state.formData.parentId = parentCategory.id;
-        state.formData.level = parentCategory.level + 1;
-
-        PmsCategoryAPI.add(state.formData).then(() => {
-          ElMessage.success("新增成功");   // 关闭对话框
-          closeDialog();
-          handleQuery();       // 刷新数据
-        });
+    if (formData.id) {
+      // 修改操作
+      await PmsCategoryAPI.update(formData.id, formData)
+      ElMessage.success('修改成功')
+    } else {
+      // 新增操作
+      const newData = {
+        ...formData,
+        parentId: parentCategory.id,
+        level: (parentCategory.level || 0) + 1
       }
+      await PmsCategoryAPI.add(newData)
+      ElMessage.success('新增成功')
     }
-  });
-}
 
+    closeDialog()
+    handleQuery()
+  } catch (error) {
+    console.error('提交表单失败:', error)
+  }
+}
 
 /**
  * 删除分类
- * @param row - 要删除的分类节点数据
  */
-function handleDelete(row: any) {
+const handleDelete = async (row: any) => {
+  try {
+    await ElMessageBox.confirm('确认删除已选中的数据项?', '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
 
-  // 准备要删除的ID（支持单个或多个）
-  const ids = [row.id || state.ids].join(",");
+    const ids = [row.id].join(',')
+    await PmsCategoryAPI.deleteByIds(ids)
 
-  // 显示确认对话框
-  ElMessageBox.confirm("确认删除已选中的数据项?", "警告", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning",
-  }).then(() => {
-
-    // 用户确认后执行删除
-    PmsCategoryAPI.deleteByIds(ids).then(() => {
-      ElMessage.success("删除成功");
-      handleQuery();
-    });
-  });
+    ElMessage.success('删除成功')
+    handleQuery()
+  } catch {
+    // 用户取消删除
+    console.log('取消删除')
+  }
 }
 
 /**
- * 关闭对话框并重置表单
+ * 重置表单
  */
-function closeDialog() {
-  state.dialog.visible = false;   // 隐藏对话框
-  dataFormRef.value.resetFields();  // 重置表单字段
-  state.dialog.visible = false;    // 清空父级分类信息
+const resetForm = () => {
+  Object.assign(formData, {
+    id: undefined,
+    name: '',
+    parentId: 0,
+    level: undefined,
+    iconUrl: '',
+    visible: 1,
+    sort: 100
+  })
+
+  Object.assign(parentCategory, {
+    id: 0,
+    name: '',
+    level: 0
+  })
+
+  if (dataFormRef.value) {
+    dataFormRef.value.clearValidate()
+  }
 }
 
-// 组件挂载时自动加载数据
+/**
+ * 关闭对话框
+ */
+const closeDialog = () => {
+  dialogVisible.value = false
+  resetForm()
+}
+
+// 组件挂载时加载数据
 onMounted(() => {
-  handleQuery();
-});
+  handleQuery()
+})
+
+// 组件挂载时
+onMounted(() => {
+  console.log('📌 父组件挂载')
+})
+
+// 组件卸载时
+onUnmounted(() => {
+  console.log('❌ 父组件卸载')
+  showCategoryTree.value = false
+
+  // 强制 GC（如果可用）
+  if (window.gc) {
+    window.gc()
+  }
+})
+
+
+
 </script>
 
-<!--
-  模板说明：
-  1. 使用el-tree展示分类树形结构
-  2. 通过插槽自定义树节点的显示内容
-  3. 只有叶子节点（三级分类）显示图标
-  4. 非叶子节点显示"新增"按钮
-  5. 所有节点（除根节点）都显示"编辑"按钮
-  6. 只有叶子节点显示"删除"按钮
--->
-<!-- 商品分类层级最多为三层，level字段标识 -->
+<style lang="scss" scoped>
+.component-container {
+  width: 100%;
+  height: 100%;
+}
 
-
-
-<!-- 组件样式 -->
-<style lang="scss">
 .category {
-
-  /* 树节点容器样式 */
   &_node {
     display: flex;
-    align-items: center;   /* 垂直居中 */
-    justify-content: space-between;    /* 两端对齐 */
+    align-items: center;
+    justify-content: space-between;
     font-size: 14px;
-    width: 100%;  /* 确保占满整行 */
+    width: 100%;
+    padding: 5px 0;
 
-    /* 图标样式 */
     &_img {
       width: 20px;
       height: 20px;
-      margin-top: -5px;    /* 微调垂直位置 */
-      vertical-align: middle;   /* 垂直居中 */
-      margin-right: 5px;     /* 图标和文字间距 */
+      margin-top: -5px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+
+    .el-button {
+      margin-left: 8px;
     }
   }
 }

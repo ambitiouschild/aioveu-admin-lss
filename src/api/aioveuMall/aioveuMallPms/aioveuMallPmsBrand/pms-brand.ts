@@ -11,6 +11,15 @@ const PmsBrandAPI = {
             params: queryParams,
         });
     },
+
+  /** 获取商品品牌列表 */
+  getBrandList(queryParams?: PmsBrandPageQuery) {
+    return request({
+      url: `${PMSBRAND_BASE_URL}`,
+      method: "get",
+      params: queryParams,
+    });
+  },
     /**
      * 获取商品品牌表单数据
      *

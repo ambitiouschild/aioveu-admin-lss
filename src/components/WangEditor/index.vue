@@ -84,4 +84,5 @@ onBeforeUnmount(() => {
   if (editor == null) return;
   editor.destroy();
 });
+
 </script>

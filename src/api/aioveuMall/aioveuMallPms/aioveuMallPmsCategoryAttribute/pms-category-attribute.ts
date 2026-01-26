@@ -11,6 +11,15 @@ const PmsCategoryAttributeAPI = {
             params: queryParams,
         });
     },
+
+  /** 获取商品类型（规格，属性）分页数据 */
+  getAttributeList(queryParams?: object) {
+    return request({
+      url: `${PMSCATEGORYATTRIBUTE_BASE_URL}/attributes`,
+      method: "get",
+      params: queryParams,
+    });
+  },
     /**
      * 获取商品类型（规格，属性）表单数据
      *
@@ -33,9 +42,22 @@ const PmsCategoryAttributeAPI = {
         return request({
             url: `${PMSCATEGORYATTRIBUTE_BASE_URL}`,
             method: "post",
-            data: data,
+            data,
         });
     },
+
+  /**
+   *  批量修改商品分类类型（规格，属性）
+   *
+   *  @param data 商品类型（规格，属性）表单数据
+   */
+  saveAttributeBatch(data: PmsCategoryAttributeForm) {
+    return request({
+      url: `${PMSCATEGORYATTRIBUTE_BASE_URL}/batch`,
+      method: "post",
+      data,
+    });
+  },
 
     /**
      * 更新商品类型（规格，属性）
@@ -47,7 +69,7 @@ const PmsCategoryAttributeAPI = {
         return request({
             url: `${PMSCATEGORYATTRIBUTE_BASE_URL}/${id}`,
             method: "put",
-            data: data,
+            data,
         });
     },
 

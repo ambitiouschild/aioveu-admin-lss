@@ -11,6 +11,16 @@ const PmsSpuAttributeAPI = {
             params: queryParams,
         });
     },
+
+  /** 获取商品类型（属性/规格）列表 */
+  getAttributeList(queryParams:any) {
+    return request({
+      url: `${PMSSPUATTRIBUTE_BASE_URL}`,
+      method: "get",
+      params: queryParams,
+    });
+  },
+
     /**
      * 获取商品类型（属性/规格）表单数据
      *
@@ -33,9 +43,22 @@ const PmsSpuAttributeAPI = {
         return request({
             url: `${PMSSPUATTRIBUTE_BASE_URL}`,
             method: "post",
-            data: data,
+            data,
         });
     },
+
+      /**
+       *  批量修改商品类型（属性/规格）
+       *
+       *  @param data 商品类型（属性/规格）表单数据
+       */
+      saveAttributeBatch(data: PmsSpuAttributeForm) {
+        return request({
+          url: `${PMSSPUATTRIBUTE_BASE_URL}/batch`,
+          method: "post",
+          data,
+        });
+      },
 
     /**
      * 更新商品类型（属性/规格）
