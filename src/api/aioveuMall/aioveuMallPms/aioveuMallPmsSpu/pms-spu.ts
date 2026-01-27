@@ -13,9 +13,9 @@ const PmsSpuAPI = {
     },
 
   /** 获取商品详情 */
-  getSpuDetail(id: string) {
+  getSpuDetail(id: number) {
     return request({
-      url: `${PMSSPU_BASE_URL}/page/${id}/detail`,
+      url: `${PMSSPU_BASE_URL}/${id}/detail`,
       method: "get",
     });
   },
@@ -55,7 +55,7 @@ const PmsSpuAPI = {
      */
      update(id: number, data: PmsSpuForm) {
         return request({
-            url: `${PMSSPU_BASE_URL}/${id}`,
+            url: `${PMSSPU_BASE_URL}/admin/${id}`,
             method: "put",
             data,
         });
