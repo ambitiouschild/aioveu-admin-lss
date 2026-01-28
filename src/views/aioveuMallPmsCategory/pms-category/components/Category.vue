@@ -167,7 +167,7 @@ const formData = reactive({
   level: undefined as number | undefined,
   iconUrl: '',
   visible: 1,  // ✅ 改为数字类型
-  sort: 100
+  sort: 1
 })
 
 // 表单验证规则
