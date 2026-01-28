@@ -306,7 +306,7 @@ const handleUpdate = (row: any) => {
     level: row.level,
     iconUrl: row.iconUrl || '',
     visible: row.visible,  // ✅ 确保转换为数字
-    sort: row.sort || 100
+    sort: row.sort || 1
   })
 }
 
@@ -375,7 +375,7 @@ const resetForm = () => {
     level: undefined,
     iconUrl: '',
     visible: 1,
-    sort: 100
+    sort: 1
   })
 
   Object.assign(parentCategory, {
