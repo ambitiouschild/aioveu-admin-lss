@@ -159,13 +159,14 @@ const loading = ref(true)
 const categoryOptions = ref<any[]>([])
 
 // 表单数据
+// 但 el-radio 的 label 是数字
 const formData = reactive({
   id: undefined as number | undefined,
   name: '',
   parentId: 0,
   level: undefined as number | undefined,
   iconUrl: '',
-  visible: 1,
+  visible: 1,  // ✅ 改为数字类型
   sort: 100
 })
 
@@ -176,6 +177,9 @@ const rules = reactive<FormRules>({
   ],
   parentId: [
     { required: true, message: '请选择上级分类', trigger: 'blur' }
+  ],
+  visible: [
+    { required: true, message: '请选择显示状态', trigger: 'change' }
   ]
 })
 
@@ -301,7 +305,7 @@ const handleUpdate = (row: any) => {
     parentId: row.parentId,
     level: row.level,
     iconUrl: row.iconUrl || '',
-    visible: row.visible || 1,
+    visible: row.visible,  // ✅ 确保转换为数字
     sort: row.sort || 100
   })
 }
@@ -370,7 +374,7 @@ const resetForm = () => {
     parentId: 0,
     level: undefined,
     iconUrl: '',
-    visible: 1,
+    visible: '',
     sort: 100
   })
 
