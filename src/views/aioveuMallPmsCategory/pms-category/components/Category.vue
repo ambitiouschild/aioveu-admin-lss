@@ -374,7 +374,7 @@ const resetForm = () => {
     parentId: 0,
     level: undefined,
     iconUrl: '',
-    visible: '',
+    visible: 1,
     sort: 100
   })
 
