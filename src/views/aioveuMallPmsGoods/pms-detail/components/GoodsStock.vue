@@ -295,6 +295,9 @@ import { ElMessage, ElNotification, type FormInstance, type FormRules } from "el
 import { Plus, Minus } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 
+import { useGoodsStoreHook } from '@/store/modules/goods.store';
+// 在 setup 中获取 store
+const goodsState = useGoodsStoreHook();
 // 导入组件
 import SingleImageUpload from "@/components/Upload/SingleImageUpload.vue";
 
@@ -381,6 +384,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "prev"): void; // 上一步事件
   (e: "update:modelValue", value: GoodsInfo): void; // 更新商品信息
+  (e: "submit-success", categoryId?: number): void;  // ✅ 新增
 }>();
 
 // ==================== 路由和组件引用 ====================
@@ -1041,8 +1045,6 @@ const handleSubmit = async (): Promise<void> => {
         type: "success",
       });
 
-      // ❌ 删除这行：不应该在子组件中控制步骤
-      router.push("/pms/pms-brand");
     } else {
       // 新增
       await PmsSpuAPI.add(submitData);
@@ -1052,13 +1054,44 @@ const handleSubmit = async (): Promise<void> => {
         type: "success",
       });
 
-      // ❌ 删除这行：不应该在子组件中控制步骤
-      // 提交成功后可以跳转到列表页
-      router.push("/pms/pms-brand");
     }
-    //
-    // // 跳转到商品列表
-    // router.push("/goods/list");
+
+
+    // ✅ 关键：确保状态被保存
+    if (goodsInfo.value.categoryId) {
+      // 标记需要恢复状态
+      goodsState.shouldRestoreState = true;
+
+      // 如果 store 中没有当前分类，保存它
+      if (!goodsState.currentCategoryId) {
+        goodsState.saveCategoryState(goodsInfo.value.categoryId);
+      }
+    }
+
+    // 重置商品信息，但保留分类
+    const resetInfo = {
+      ...goodsInfo.value,
+      id: undefined,
+      name: "",
+      picUrl: "",
+      specList: [],
+      skuList: [],
+      attrList: [],
+      price: undefined,
+      originPrice: undefined,
+      album: [],
+      detail: "",
+      // 保留分类ID
+      categoryId: goodsInfo.value.categoryId
+    } as GoodsInfo;
+
+    emit("update:modelValue", resetInfo);
+
+    // 通知父组件返回第一步
+    // ✅ 触发完成事件，携带分类ID
+    emit("submit-success", goodsInfo.value.categoryId);
+
+
   } catch (error: any) {
     console.error("❌ 提交失败:", error);
 
@@ -1070,6 +1103,9 @@ const handleSubmit = async (): Promise<void> => {
       ElMessage.error(`提交失败: ${error.message || "未知错误"}`);
     }
   }
+
+
+
 };
 
 // ==================== 生命周期钩子 ====================

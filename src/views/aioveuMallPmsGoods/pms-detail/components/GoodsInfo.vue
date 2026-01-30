@@ -182,6 +182,7 @@
 // ==================== 导入依赖 ====================
 import { ref, computed, onMounted, reactive } from "vue";
 import { ElMessage, type FormInstance } from "element-plus";
+import { useGoodsStoreHook } from '@/store/modules/goods.store'
 
 // 导入组件
 import Editor from "@/components/WangEditor/index.vue";
@@ -193,6 +194,11 @@ import PmsBrandAPI from "@/api/aioveuMall/aioveuMallPms/aioveuMallPmsBrand/pms-b
 
 // 导入父组件使用的类型
 import type { PmsSpuPageVO } from "@/api/aioveuMall/aioveuMallPms/aioveuMallPmsSpu/pms-spu";
+
+
+// 获取 store
+const goodsState = useGoodsStoreHook();
+
 
 // ==================== 类型定义 ====================
 interface BrandOption {
@@ -308,6 +314,12 @@ const formatPrice = (price: number | undefined): string => {
  */
 const handlePrev = (): void => {
   console.log("⬅️ 返回上一步");
+
+  // 保存当前分类状态
+  if (goodsInfo.value.categoryId) {
+    goodsState.shouldRestoreState = true;
+  }
+
   emit("prev");
 };
 

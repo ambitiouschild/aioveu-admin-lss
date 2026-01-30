@@ -175,7 +175,7 @@
 import { ref, computed, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, type CascaderPanelInstance } from "element-plus";
-
+import { useGoodsStoreHook  } from '@/store/modules/goods.store';
 // 导入API
 import PmsCategoryAPI from "@/api/aioveuMall/aioveuMallPms/aioveuMallPmsCategory/pms-category";
 import PmsSpuAPI from "@/api/aioveuMall/aioveuMallPms/aioveuMallPmsSpu/pms-spu";
@@ -247,6 +247,9 @@ const goodsList = ref<GoodsItem[]>([]);
 const loadingGoods = ref(false);
 const selectedThirdLevelName = ref("");
 
+// 获取 store
+const goodsState = useGoodsStoreHook();
+
 // 商品信息双向绑定
 const goodsInfo = computed<GoodsInfo>({
 
@@ -285,6 +288,9 @@ const loadCategoryData = async (): Promise<void> => {
       categoryOptions.value = data as CategoryOption[];
       console.log("✅ 商品分类数据加载完成");
 
+      // ✅ 关键修改：加载保存的状态
+      await restoreCategoryState();
+
       if (goodsInfo.value.id && goodsInfo.value.categoryId) {
         await nextTick();
         initializeSelectedCategory();
@@ -296,6 +302,47 @@ const loadCategoryData = async (): Promise<void> => {
   } catch (error) {
     console.error("❌ 加载商品分类数据失败:", error);
     ElMessage.error("加载商品分类失败，请重试");
+  }
+};
+
+// ✅ 新增：恢复分类状态的方法
+const restoreCategoryState = async () => {
+  const savedCategoryId = goodsState.getCategory();
+  if (savedCategoryId && goodsState.shouldRestoreState) {
+    console.log('🔄 恢复分类状态:', savedCategoryId);
+
+    // 设置商品信息中的分类ID
+    goodsInfo.value.categoryId = savedCategoryId;
+
+    // 设置路径标签
+    if (goodsState.pathLabels && goodsState.pathLabels.length > 0) {
+      pathLabels.value = goodsState.pathLabels;
+    }
+
+    // 设置三级分类名称
+    if (goodsState.selectedThirdLevelName) {
+      selectedThirdLevelName.value = goodsState.selectedThirdLevelName;
+    }
+
+    // 等待DOM更新
+    await nextTick();
+
+    // 尝试设置级联选择器的选中状态
+    if (categoryRef.value) {
+      try {
+        // 这里需要根据你的级联组件API来设置选中
+        // 例如：categoryRef.value.setCheckedNodes([/* 节点 */])
+        console.log('尝试设置级联选择器选中状态');
+      } catch (error) {
+        console.error('设置级联选择器选中状态失败:', error);
+      }
+    }
+
+    // 加载该分类下的商品
+    await loadGoodsByCategory(savedCategoryId);
+
+    // 标记状态已恢复
+    goodsState.shouldRestoreState = false;
   }
 };
 
@@ -313,6 +360,10 @@ const handleCategoryChange = async (): Promise<void> => {
       goodsInfo.value.categoryId = undefined;
       goodsList.value = [];
       selectedThirdLevelName.value = "";
+
+      // 清除保存的状态
+      goodsState.clearState();
+
       return;
     }
 
@@ -336,10 +387,19 @@ const handleCategoryChange = async (): Promise<void> => {
 
     // 如果是第三级分类，加载该分类下的商品
     if (nodePathLabels.length === 3) {
+
+    // ✅ 关键：保存状态到 store
+      goodsState.saveCategoryState(
+        nodeValue,
+        nodePathLabels,
+        nodePathLabels[2]
+      );
+      // 调用API获取该分类下的商品getPage
       await loadGoodsByCategory(nodeValue);
     } else {
       goodsList.value = [];
       selectedThirdLevelName.value = "";
+      goodsState.clearState();
     }
   } catch (error) {
     console.error("❌ 处理分类选择变化失败:", error);
@@ -347,6 +407,7 @@ const handleCategoryChange = async (): Promise<void> => {
   }
 };
 
+// 调用API获取该分类下的商品getPage
 const loadGoodsByCategory = async (categoryId: number): Promise<void> => {
   try {
     loadingGoods.value = true;
@@ -428,13 +489,18 @@ const handleAddGoods = () => {
     return;
   }
 
-  router.push({
-    path: '/goods/detail',
-    query: {
-      categoryId: goodsInfo.value.categoryId,
-      mode: 'add'
-    }
-  });
+  // ✅ 确保是新增模式
+  goodsInfo.value.id = undefined;
+
+  emit("next");
+
+  // router.push({
+  //   path: '/goods/detail',
+  //   query: {
+  //     categoryId: goodsInfo.value.categoryId,
+  //     mode: 'add'
+  //   }
+  // });
 };
 
 //每次操作前清空ID（推荐）
@@ -444,11 +510,24 @@ const handleNext = (): void => {
     return;
   }
 
-  // 关键：清空ID，确保是新增模式
-  goodsInfo.value.id = undefined;
-  goodsInfo.value.name = "";
-  goodsInfo.value.picUrl = "";
-  // 清空其他商品相关字段...
+// ✅ 关键判断：如果有商品ID，说明是编辑模式，不清除数据
+  // 如果没有商品ID，说明是新增模式，清除数据
+  if (!goodsInfo.value.id) {
+    // 新增模式：清除商品信息
+    goodsInfo.value = {
+      ...goodsInfo.value,
+      name: "",
+      picUrl: "",
+      price: undefined,
+      originPrice: undefined,
+      album: [],
+      detail: "",
+      // 但保留分类ID
+      categoryId: goodsInfo.value.categoryId
+    };
+  }
+
+  console.log("➡️ 进入下一步，模式:", goodsInfo.value.id ? '编辑' : '新增', "分类ID:", goodsInfo.value.categoryId);
 
   console.log("➡️ 进入下一步，已选分类ID:", goodsInfo.value.categoryId);
   emit("next");
@@ -482,7 +561,16 @@ const initializeSelectedCategory = async (): Promise<void> => {
 
 onMounted(() => {
   console.log("🔄 商品分类选择组件挂载");
+
+  // 尝试加载保存的分类
+  const savedCategoryId = goodsState.getCategory();
+  if (savedCategoryId) {
+    console.log('📂 加载保存的分类ID:', savedCategoryId);
+    // 可以在这里预选中分类
+    goodsInfo.value.categoryId = savedCategoryId;
+  }
   loadCategoryData();
+
 });
 </script>
 

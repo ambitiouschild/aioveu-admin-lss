@@ -24,6 +24,7 @@
     <!-- 商品分类选择组件（编辑模式需要回显） -->
     <!-- 监听编辑事件 -->
     <!--    使用 v-if配合 activeStep条件，确保每次只渲染一个子组件-->
+<!--    4个组件都在同一个页面里，通过 v-if切换显示，而不是真正的路由跳转。这种情况下，路由参数方法就不适用了。-->
         <GoodsCategory
           v-if="activeStep === 0"
           v-model="goodsInfo"
@@ -57,6 +58,7 @@
           v-model="goodsInfo"
           @prev="handlePrevStep"
           @next="handleNextStep"
+          @submit-success="handleSubmitSuccess"
         />
 
 <!--   ===========================================  -->
@@ -175,8 +177,44 @@ const loadGoodsData = async (): Promise<void> => {
 //  */
 const handlePrevStep = (): void => {
   if (activeStep.value > 0) {
+
+    const previousStep = activeStep.value;
+
     activeStep.value--;
-    console.log(`⬅️ 返回上一步，当前步骤: ${activeStep.value}`);
+    console.log(`⬅️ 返回上一步: ${previousStep} -> ${activeStep.value}`);
+
+    // ✅ 关键：如果从步骤1返回步骤0，且当前是编辑模式，重置为新增
+    if (previousStep === 1 && activeStep.value === 0) {
+      // 保存当前分类ID
+      const currentCategoryId = goodsInfo.value.categoryId;
+
+      // 重置商品信息，保留分类
+      goodsInfo.value = {
+        id: undefined,  // 清除商品ID
+        name: "",
+        categoryId: currentCategoryId,
+        brandId: undefined,
+        originPrice: undefined,
+        price: undefined,
+        album: [],
+        attrList: [],
+        specList: [],
+        skuList: [],
+        detail: "",
+        sales: 0,
+        stock: 0,
+        picUrl: "",
+        categoryName: "",
+        brandName: "",
+      };
+
+      console.log("🔄 从编辑模式返回，重置为新增模式，分类ID:", currentCategoryId);
+    }
+
+
+
+
+
   }
 };
 
@@ -189,6 +227,27 @@ const handleNextStep = (): void => {
     console.log(`➡️ 进入下一步，当前步骤: ${activeStep.value}`);
   }
 };
+
+
+// 父组件逻辑
+const handleSubmitSuccess = (categoryId: number) => {
+  console.log('✅ 商品提交成功，分类ID:', categoryId);
+
+  // 保存分类ID
+  if (categoryId) {
+    // 重置商品信息，但保留分类
+    goodsInfo.value.categoryId = categoryId;
+
+  }
+  // 返回第一步
+  activeStep.value = 0;
+
+  // 显示成功消息
+  ElMessage.success('商品保存成功，可以继续添加商品');
+};
+
+
+
 
 /**
  * 根据路由参数确定当前步骤
@@ -230,7 +289,7 @@ onMounted(async () => {
   console.log(`✅ GoodsDetail 页面激活`)
 
   // 初始化当前步骤
-  // initActiveStep();
+  initActiveStep();
 
   // 确保DOM更新完成
   await nextTick();
@@ -295,6 +354,16 @@ watch(activeStep, (newStep, oldStep) => {
 
   // 可以在这里添加步骤切换时的额外逻辑
   // 例如：保存当前步骤数据、验证当前步骤等
+
+  // 当返回到第一步时，确保状态恢复
+  if (newStep === 1) {
+    // 延迟一下，确保 GoodsCategory 组件已挂载
+    setTimeout(() => {
+      // 这里可以通过 ref 调用 GoodsCategory 的方法
+      // 或者依赖 store 自动恢复
+    }, 300);
+  }
+
 
   // 更新URL，支持直接跳转到指定步骤
   const currentQuery = { ...route.query };
