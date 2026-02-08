@@ -67,11 +67,12 @@ const OmsOrderAPI = {
 export default OmsOrderAPI;
 
 /** 订单详情分页查询参数 */
-export interface OmsOrderPageQuery extends PageQuery {
-}
+export interface OmsOrderPageQuery extends PageQuery {}
 
 /** 订单详情表单对象 */
 export interface OmsOrderForm {
+
+    id?:  number;
     /** 订单号 */
     orderSn?:  string;
     /** 订单总额（分） */

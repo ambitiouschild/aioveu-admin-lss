@@ -67,7 +67,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
           // 代理目标地址：https://api.youlai.tech
 
           // target: env.VITE_APP_API_URL,       //target: 代理的目标地址，来自环境变量VITE_APP_API_URL，例如"https://api.aioveu.com
-          target:  'http://localhost:9999',  // 必须是网关地址
+          target:  'http://localhost:6666',  // 必须是网关地址
           //rewrite: 重写路径，这里使用一个函数，将路径中的VITE_APP_BASE_API部分替换为空字符串。
 
           //1.计算机A - Vite 配置, rewrite，去除/dev-api ，因为计算机B的Nginx已经去除处理路径/dev-api
