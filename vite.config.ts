@@ -66,8 +66,8 @@ export default defineConfig(({ mode }: ConfigEnv) => {
           changeOrigin: true,            //changeOrigin: true，改变请求头中的host为目标URL的host，用于解决跨域问题。
           // 代理目标地址：https://api.youlai.tech
 
-          // target: env.VITE_APP_API_URL,       //target: 代理的目标地址，来自环境变量VITE_APP_API_URL，例如"https://api.aioveu.com
-          target:  'http://localhost:6666',  // 必须是网关地址
+          target: env.VITE_APP_API_URL,       //target: 代理的目标地址，来自环境变量VITE_APP_API_URL，例如"https://api.aioveu.com
+          // target:  'http://localhost:6666',  // 必须是网关地址
           //rewrite: 重写路径，这里使用一个函数，将路径中的VITE_APP_BASE_API部分替换为空字符串。
 
           //1.计算机A - Vite 配置, rewrite，去除/dev-api ，因为计算机B的Nginx已经去除处理路径/dev-api

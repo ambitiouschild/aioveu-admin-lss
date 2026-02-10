@@ -11,18 +11,14 @@
           emitPath: false,
           value: 'value',
           label: 'label',
-          children: 'children'
+          children: 'children',
         }"
         @change="handleCategoryChange"
       />
 
       <!-- 分类路径显示 -->
       <div class="path-display" style="margin-top: 20px">
-        <el-link
-          v-show="pathLabels.length > 0"
-          type="info"
-          underline="never"
-        >
+        <el-link v-show="pathLabels.length > 0" type="info" underline="never">
           您选择的商品分类:
         </el-link>
         <el-link
@@ -33,12 +29,7 @@
           class="path-item"
         >
           {{ item }}
-          <span
-            v-show="index < pathLabels.length - 1"
-            class="separator"
-          >
-            &gt;
-          </span>
+          <span v-show="index < pathLabels.length - 1" class="separator">&gt;</span>
         </el-link>
       </div>
 
@@ -47,13 +38,7 @@
         <div class="section-header">
           <h3>{{ selectedThirdLevelName }} - 商品列表</h3>
           <div class="section-actions">
-            <el-button
-              type="primary"
-              size="small"
-              @click="handleAddGoods"
-            >
-              新增商品
-            </el-button>
+            <el-button type="primary" size="small" @click="handleAddGoods">新增商品</el-button>
           </div>
         </div>
 
@@ -66,10 +51,7 @@
           v-loading="loadingGoods"
           class="goods-table"
         >
-          <el-table-column
-            label="商品名称"
-            width="200"
-          >
+          <el-table-column label="商品名称" width="200">
             <template #default="scope">
               <div class="goods-info">
                 <el-image
@@ -83,60 +65,27 @@
             </template>
           </el-table-column>
 
-          <el-table-column
-            prop="price"
-            label="价格"
-            width="120"
-            align="right"
-          >
-            <template #default="scope">
-              ¥{{ formatPrice(scope.row.price) }}
-            </template>
+          <el-table-column prop="price" label="价格" width="120" align="right">
+            <template #default="scope">¥{{ formatPrice(scope.row.price) }}</template>
           </el-table-column>
 
-          <el-table-column
-            prop="stock"
-            label="库存"
-            width="100"
-            align="center"
-          />
+          <el-table-column prop="stock" label="库存" width="100" align="center" />
 
-          <el-table-column
-            prop="status"
-            label="状态"
-            width="100"
-            align="center"
-          >
+          <el-table-column prop="status" label="状态" width="100" align="center">
             <template #default="scope">
-              <el-tag
-                :type="scope.row.status === 1 ? 'success' : 'info'"
-                size="small"
-              >
-                {{ scope.row.status === 1 ? '上架' : '下架' }}
+              <el-tag :type="scope.row.status === 1 ? 'success' : 'info'" size="small">
+                {{ scope.row.status === 1 ? "上架" : "下架" }}
               </el-tag>
             </template>
           </el-table-column>
 
-          <el-table-column
-            label="操作"
-            width="150"
-            align="center"
-            fixed="right"
-          >
+          <el-table-column label="操作" width="150" align="center" fixed="right">
             <template #default="scope">
               <el-button-group>
-                <el-button
-                  type="primary"
-                  size="small"
-                  @click="handleViewGoods(scope.row)"
-                >
+                <el-button type="primary" size="small" @click="handleViewGoods(scope.row)">
                   查看
                 </el-button>
-                <el-button
-                  type="success"
-                  size="small"
-                  @click="handleEditGoods(scope.row)"
-                >
+                <el-button type="success" size="small" @click="handleEditGoods(scope.row)">
                   编辑
                 </el-button>
               </el-button-group>
@@ -147,12 +96,7 @@
         <!-- 空状态 -->
         <div v-if="goodsList.length === 0 && !loadingGoods" class="empty-goods">
           <el-empty description="该分类下暂无商品">
-            <el-button
-              type="primary"
-              @click="handleAddGoods"
-            >
-              新增商品
-            </el-button>
+            <el-button type="primary" @click="handleAddGoods">新增商品</el-button>
           </el-empty>
         </div>
       </div>
@@ -160,11 +104,7 @@
 
     <!-- 底部按钮 -->
     <div class="component-container__footer">
-      <el-button
-        type="primary"
-        :disabled="!goodsInfo.categoryId"
-        @click="handleNext"
-      >
+      <el-button type="primary" :disabled="!goodsInfo.categoryId" @click="handleNext">
         下一步，填写商品信息
       </el-button>
     </div>
@@ -175,7 +115,7 @@
 import { ref, computed, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, type CascaderPanelInstance } from "element-plus";
-import { useGoodsStoreHook  } from '@/store/modules/goods.store';
+import { useGoodsStoreHook } from "@/store/modules/goods.store";
 // 导入API
 import PmsCategoryAPI from "@/api/aioveuMall/aioveuMallPms/aioveuMallPmsCategory/pms-category";
 import PmsSpuAPI from "@/api/aioveuMall/aioveuMallPms/aioveuMallPmsSpu/pms-spu";
@@ -202,7 +142,6 @@ interface GoodsInfo {
   [key: string]: any;
 }
 
-
 /*GoodsCategory.vue (子组件)
         ↓
    emit("update:modelValue")  // 双向绑定更新
@@ -215,12 +154,10 @@ GoodsInfo.vue (下一步组件)    // 接收 goodsInfo*/
 /*当您在 GoodsCategory.vue中修改 goodsInfo.value时，它会通过 emit("update:modelValue")
 更新父组件的 goodsInfo。但是当切换到下一步时，GoodsInfo.vue可能没有正确接收到更新后的数据。*/
 
-
 // Props和Emit
 const props = defineProps<{
   modelValue: GoodsInfo;
 }>();
-
 
 /*在商品分类页面：
 用户选择分类
@@ -233,8 +170,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "next"): void;
-  (e: "update:modelValue", value: GoodsInfo): void;  // 双向绑定
-  (e: "edit-goods", goodsId: number): void;  // 新增：编辑商品
+  (e: "update:modelValue", value: GoodsInfo): void; // 双向绑定
+  (e: "edit-goods", goodsId: number): void; // 新增：编辑商品
 }>();
 
 const router = useRouter();
@@ -252,7 +189,6 @@ const goodsState = useGoodsStoreHook();
 
 // 商品信息双向绑定
 const goodsInfo = computed<GoodsInfo>({
-
   //当您修改 goodsInfo.value.id时，只修改了计算属性的一个属性，没有触发 setter！
   //Vue 的计算属性 setter 只在重新赋值整个对象时触发，修改对象属性不会触发。
   get: () => props.modelValue,
@@ -272,9 +208,10 @@ const loadCategoryData = async (): Promise<void> => {
     console.log("📦 开始加载商品分类数据");
 
     const response = await PmsCategoryAPI.getCategoryOptions();
-    let data: any = response;
 
-    if (response && typeof response === 'object') {
+    let data: any = response;
+    console.log("📦 data" ,data);
+    if (response && typeof response === "object") {
       if (response.data && Array.isArray(response.data)) {
         data = response.data;
       } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
@@ -309,7 +246,7 @@ const loadCategoryData = async (): Promise<void> => {
 const restoreCategoryState = async () => {
   const savedCategoryId = goodsState.getCategory();
   if (savedCategoryId && goodsState.shouldRestoreState) {
-    console.log('🔄 恢复分类状态:', savedCategoryId);
+    console.log("🔄 恢复分类状态:", savedCategoryId);
 
     // 设置商品信息中的分类ID
     goodsInfo.value.categoryId = savedCategoryId;
@@ -332,9 +269,9 @@ const restoreCategoryState = async () => {
       try {
         // 这里需要根据你的级联组件API来设置选中
         // 例如：categoryRef.value.setCheckedNodes([/* 节点 */])
-        console.log('尝试设置级联选择器选中状态');
+        console.log("尝试设置级联选择器选中状态");
       } catch (error) {
-        console.error('设置级联选择器选中状态失败:', error);
+        console.error("设置级联选择器选中状态失败:", error);
       }
     }
 
@@ -382,18 +319,13 @@ const handleCategoryChange = async (): Promise<void> => {
     console.log("📋 选择的分类:", {
       id: nodeValue,
       path: nodePathLabels.join(" > "),
-      level: nodePathLabels.length
+      level: nodePathLabels.length,
     });
 
     // 如果是第三级分类，加载该分类下的商品
     if (nodePathLabels.length === 3) {
-
-    // ✅ 关键：保存状态到 store
-      goodsState.saveCategoryState(
-        nodeValue,
-        nodePathLabels,
-        nodePathLabels[2]
-      );
+      // ✅ 关键：保存状态到 store
+      goodsState.saveCategoryState(nodeValue, nodePathLabels, nodePathLabels[2]);
       // 调用API获取该分类下的商品getPage
       await loadGoodsByCategory(nodeValue);
     } else {
@@ -417,21 +349,21 @@ const loadGoodsByCategory = async (categoryId: number): Promise<void> => {
     const response = await PmsSpuAPI.getPage({
       categoryId,
       pageNum: 1,
-      pageSize: 10
+      pageSize: 10,
     });
 
-    const responseData  = response as any;
-    console.log("📦 加载到的商品列表:", responseData );
-    console.log("📦 加载到的商品列表response.data:", responseData .list);
+    const responseData = response as any;
+    console.log("📦 加载到的商品列表:", responseData);
+    console.log("📦 加载到的商品列表response.data:", responseData.list);
 
-    if (response && responseData .list) {
+    if (response && responseData.list) {
       goodsList.value = responseData.list.map((item: any) => ({
         id: item.id,
-        name: item.name || '未命名商品',
+        name: item.name || "未命名商品",
         picUrl: item.picUrl,
         price: item.price || 0,
         stock: item.stock || 0,
-        status: item.status || 0
+        status: item.status || 0,
       }));
 
       console.log(`✅ 加载到 ${goodsList.value.length} 个商品`);
@@ -451,11 +383,11 @@ const loadGoodsByCategory = async (categoryId: number): Promise<void> => {
 const handleViewGoods = (goods: GoodsItem) => {
   console.log("👀 查看商品:", goods);
   router.push({
-    path: '/goods/detail',
+    path: "/goods/detail",
     query: {
       goodsId: goods.id,
-      mode: 'view'
-    }
+      mode: "view",
+    },
   });
 };
 
@@ -464,8 +396,6 @@ const handleViewGoods = (goods: GoodsItem) => {
 // 2. 点击编辑 → 将商品ID传递给父组件
 // 3. 父组件 → 根据商品ID获取商品详情
 // 4. 父组件 → 将完整的商品信息传递给所有子组件
-
-
 
 const handleEditGoods = (goods: GoodsItem) => {
   console.log("✏️ 编辑商品:", goods);
@@ -479,7 +409,6 @@ const handleEditGoods = (goods: GoodsItem) => {
   // 2. 等待父组件加载完成，再进入下一步
   // 不在这里触发 next，让父组件加载完数据后自己切换步骤
   // emit("next");  // 注释掉这行
-
 };
 
 const handleAddGoods = () => {
@@ -510,7 +439,7 @@ const handleNext = (): void => {
     return;
   }
 
-// ✅ 关键判断：如果有商品ID，说明是编辑模式，不清除数据
+  // ✅ 关键判断：如果有商品ID，说明是编辑模式，不清除数据
   // 如果没有商品ID，说明是新增模式，清除数据
   if (!goodsInfo.value.id) {
     // 新增模式：清除商品信息
@@ -523,21 +452,25 @@ const handleNext = (): void => {
       album: [],
       detail: "",
       // 但保留分类ID
-      categoryId: goodsInfo.value.categoryId
+      categoryId: goodsInfo.value.categoryId,
     };
   }
 
-  console.log("➡️ 进入下一步，模式:", goodsInfo.value.id ? '编辑' : '新增', "分类ID:", goodsInfo.value.categoryId);
+  console.log(
+    "➡️ 进入下一步，模式:",
+    goodsInfo.value.id ? "编辑" : "新增",
+    "分类ID:",
+    goodsInfo.value.categoryId
+  );
 
   console.log("➡️ 进入下一步，已选分类ID:", goodsInfo.value.categoryId);
   emit("next");
 };
 
 const formatPrice = (price: number): string => {
-  if (!price) return '0.00';
+  if (!price) return "0.00";
   return (price / 100).toFixed(2);
 };
-
 
 /**
  * 初始化已选中的分类（编辑模式）
@@ -565,12 +498,11 @@ onMounted(() => {
   // 尝试加载保存的分类
   const savedCategoryId = goodsState.getCategory();
   if (savedCategoryId) {
-    console.log('📂 加载保存的分类ID:', savedCategoryId);
+    console.log("📂 加载保存的分类ID:", savedCategoryId);
     // 可以在这里预选中分类
     goodsInfo.value.categoryId = savedCategoryId;
   }
   loadCategoryData();
-
 });
 </script>
 

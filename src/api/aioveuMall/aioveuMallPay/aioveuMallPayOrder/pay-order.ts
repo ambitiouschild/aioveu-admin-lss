@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const PAYORDER_BASE_URL = "/api/v1/pay-order";
+const PAYORDER_BASE_URL = "/aioveu-pay/api/v1/pay-order";
 
 const PayOrderAPI = {
     /** 获取支付订单分页数据 */

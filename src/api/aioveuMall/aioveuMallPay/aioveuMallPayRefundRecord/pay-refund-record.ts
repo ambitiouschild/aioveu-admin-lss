@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const PAYREFUNDRECORD_BASE_URL = "/api/v1/pay-refund-record";
+const PAYREFUNDRECORD_BASE_URL = "/aioveu-pay/api/v1/pay-refund-record";
 
 const PayRefundRecordAPI = {
     /** 获取退款记录分页数据 */

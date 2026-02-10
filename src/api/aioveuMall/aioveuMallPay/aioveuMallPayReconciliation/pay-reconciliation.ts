@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const PAYRECONCILIATION_BASE_URL = "/api/v1/pay-reconciliation";
+const PAYRECONCILIATION_BASE_URL = "/aioveu-pay/api/v1/pay-reconciliation";
 
 const PayReconciliationAPI = {
     /** 获取支付对账分页数据 */
