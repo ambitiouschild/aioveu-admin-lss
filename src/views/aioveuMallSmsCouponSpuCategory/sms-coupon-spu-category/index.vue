@@ -163,7 +163,8 @@
     inheritAttrs: false,
   });
 
-  import SmsCouponSpuCategoryAPI, { SmsCouponSpuCategoryPageVO, SmsCouponSpuCategoryForm, SmsCouponSpuCategoryPageQuery } from "@/api/aioveuMall/aioveuMallSms/aioveuMallSmsCouponSpuCategory/sms-coupon-spu-category";
+  import SmsCouponSpuCategoryAPI, { SmsCouponSpuCategoryPageVO, SmsCouponSpuCategoryForm, SmsCouponSpuCategoryPageQuery }
+    from "@/api/aioveuMall/aioveuMallSms/aioveuMallSmsCouponSpuCategory/sms-coupon-spu-category";
 
   const queryFormRef = ref();
   const dataFormRef = ref();

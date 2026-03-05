@@ -115,6 +115,7 @@ const isRead = ref(false);
 
 interface Model extends LoginFormData {
   confirmPassword: string;
+
 }
 
 const model = ref<Model>({

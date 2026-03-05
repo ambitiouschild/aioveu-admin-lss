@@ -149,7 +149,9 @@ export interface LoginFormData {
   grant_type?: string;
 
   /** 验证码缓存key */
+
   captchaId?: string;
+  captchaKey?: string;
 
   /** 验证码 */
   captchaCode?: string;

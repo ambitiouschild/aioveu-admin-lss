@@ -1,14 +1,15 @@
 import request from "@/utils/request";
+import { SmsHomeCategoryPageVO } from "@/api/aioveuMall/aioveuMallSms/aioveuMallSmsHomeCategory/sms-home-category";
 
 const PMSSPU_BASE_URL = "/aioveu-pms/api/v1/pms-spu";
 
 const PmsSpuAPI = {
     /** 获取商品分页数据 */
     getPage(queryParams?: PmsSpuPageQuery) {
-        return request({
-            url: `${PMSSPU_BASE_URL}/page`,
-            method: "get",
-            params: queryParams,
+        return request<any, PageResult<PmsSpuPageVO[]>>({
+          url: `${PMSSPU_BASE_URL}/page`,
+          method: "get",
+          params: queryParams,
         });
     },
 
